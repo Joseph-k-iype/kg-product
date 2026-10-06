@@ -19,3 +19,8 @@ test-results/
 design/targets/
 *.tsbuildinfo
 knowledge-backup.sql
+design/branch/.*
+design/branch/branch.attempt.json
+design/branch/branch.progress.json
+design/branch/journal.jsonl
+design/branch/prototype.status.json
