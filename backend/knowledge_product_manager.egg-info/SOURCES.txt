@@ -1,0 +1,7 @@
+pyproject.toml
+app/main.py
+knowledge_product_manager.egg-info/PKG-INFO
+knowledge_product_manager.egg-info/SOURCES.txt
+knowledge_product_manager.egg-info/dependency_links.txt
+knowledge_product_manager.egg-info/requires.txt
+knowledge_product_manager.egg-info/top_level.txt

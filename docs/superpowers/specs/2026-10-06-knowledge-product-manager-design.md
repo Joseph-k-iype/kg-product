@@ -679,3 +679,7 @@ Deliver migrations, deterministic seed and reset tooling, synthetic document fix
 ### Implementation boundaries
 
 This specification includes all six phases in section 17. Deliver incrementally in that order while preserving the final end-to-end scope. Dedicated RDF triplestore, production authentication, real external source connectors, unrestricted ontology reasoning, and LLM answer generation remain future adapter extensions. Simulated usage is explicitly labeled; real product and consumer configuration is persisted.
+
+## 21. Business-user simplicity — user correction during implementation
+
+Primary workflows must be usable without understanding graphs, Turtle, RDF, embeddings, or infrastructure. Present ontology work as Concepts & Rules, graph exploration as Explore Knowledge, mappings as advanced representation settings, and processing as Prepare Knowledge. Use business forms and plain-language constraint previews, evidence-first searchable lists, guided next actions, and a simple readiness checklist. Keep technical RDF source, graph queries, storage identifiers, and mapping mechanics in explicit Advanced views. The underlying storage and version/provenance guarantees remain required. Standard navigation labels may use these business-friendly equivalents while maintaining all specified destinations.

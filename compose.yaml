@@ -1,0 +1,57 @@
+name: knowledge-product-manager
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_DB: knowledge
+      POSTGRES_USER: knowledge
+      POSTGRES_PASSWORD: knowledge-local
+    ports: ['127.0.0.1:55432:5432']
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U knowledge -d knowledge']
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    command: server /data --console-address :9001
+    environment:
+      MINIO_ROOT_USER: knowledge
+      MINIO_ROOT_PASSWORD: knowledge-local
+    ports: ['127.0.0.1:59000:9000', '127.0.0.1:59001:9001']
+    volumes: [minio-data:/data]
+  falkordb:
+    image: falkordb/falkordb:v4.14.0
+    ports: ['127.0.0.1:56379:6379']
+    volumes: [graph-data:/data]
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  api:
+    build: ./backend
+    environment: &app-env
+      DATABASE_URL: postgresql+psycopg://knowledge:knowledge-local@postgres:5432/knowledge
+      MINIO_ENDPOINT: minio:9000
+      GRAPH_URL: redis://falkordb:6379
+      MODEL_CACHE: /models
+    command: sh -c 'alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000'
+    ports: ['127.0.0.1:58000:8000']
+    depends_on:
+      postgres: {condition: service_healthy}
+      falkordb: {condition: service_healthy}
+      minio: {condition: service_started}
+    volumes: [model-cache:/models]
+  worker:
+    build: ./backend
+    environment: *app-env
+    command: python -m app.worker
+    depends_on: [api]
+    volumes: [model-cache:/models]
+volumes:
+  postgres-data:
+  minio-data:
+  graph-data:
+  model-cache:
