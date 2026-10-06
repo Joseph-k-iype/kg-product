@@ -30,3 +30,6 @@ def health():
         except Exception:
             probes[name]='unavailable'
     return {'probes':probes,'identity_mode':'Synthetic demo identities'}
+
+from app.features.ontology.routes import router as ontology_router
+app.include_router(ontology_router)

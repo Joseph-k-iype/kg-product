@@ -1,0 +1,10 @@
+@prefix ex: <https://knowledge.example/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+ex:Complaint a owl:Class; rdfs:label "Complaint"; rdfs:comment "An issue reported by a customer." .
+ex:Customer a owl:Class; rdfs:label "Customer"; rdfs:comment "A person who uses our services." .
+ex:identifier a owl:DatatypeProperty; rdfs:label "Identifier"; rdfs:domain ex:Complaint; rdfs:range xsd:string .
+ex:submittedBy a owl:ObjectProperty; rdfs:label "Submitted by"; rdfs:domain ex:Complaint; rdfs:range ex:Customer .
+ex:ComplaintShape a sh:NodeShape; sh:targetClass ex:Complaint; sh:property [sh:path ex:identifier; sh:minCount 1; sh:maxCount 1; sh:datatype xsd:string] .
