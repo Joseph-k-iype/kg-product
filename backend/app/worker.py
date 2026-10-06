@@ -37,17 +37,17 @@ def run_once(worker_id: str) -> bool:
             },
         ]
         job_id = job.id
+        revision_id = job.revision_id
         attempt = job.attempt_count
         session.commit()
     try:
         with SessionLocal() as session:
-            job = session.get(Job, job_id)
-            # Hold the claimed row through its side effects so competing workers cannot reclaim it.
-            session.execute(select(Job).where(Job.id == job_id).with_for_update())
+            # Revision-before-job is the mutation lock order used by API preparation and edits.
+            rev = session.scalars(select(Revision).where(Revision.id == revision_id).with_for_update()).one()
+            job = session.scalars(select(Job).where(Job.id == job_id).with_for_update()).one()
             if job.attempt_count != attempt:
                 return True
             doc = session.get(Document, job.document_id) if job.document_id else None
-            rev = session.get(Revision, job.revision_id)
             if rev.state == "published":
                 raise ValueError("Published revision is read-only.")
             if job.stage == "extracted":

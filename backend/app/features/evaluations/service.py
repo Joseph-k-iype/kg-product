@@ -1,3 +1,4 @@
+from datetime import timedelta
 import json
 from hashlib import sha256
 from sqlalchemy import select
@@ -14,6 +15,26 @@ from app.features.sources.models import Source
 from app.features.evaluations.models import EvaluationRun
 from app.features.retrieval.service import default_model
 from dataclasses import asdict
+
+
+def source_freshness(session, docs):
+    inputs = []
+    for doc in docs:
+        source = session.get(Source, doc.source_id) if doc.source_id else None
+        updated = source.last_synced_at if source else doc.uploaded_at
+        days = source.freshness_days if source else 30
+        deadline = updated + timedelta(days=days) if updated else None
+        inputs.append(
+            {
+                "document_id": doc.id,
+                "source_id": doc.source_id,
+                "updated_at": updated.isoformat() if updated else None,
+                "deadline": deadline.isoformat() if deadline else None,
+                "freshness_days": days,
+                "fresh": now() <= deadline if deadline else None,
+            }
+        )
+    return inputs
 
 
 def snapshot(session, rev):
@@ -43,6 +64,7 @@ def snapshot(session, rev):
         "mapping_definition": session.get(MappingVersion, rev.mapping_id).definition
         if rev.mapping_id
         else None,
+        "freshness_inputs": source_freshness(session, docs),
         "documents": [
             {
                 "id": d.id,
@@ -126,13 +148,12 @@ def evaluate(session, rev):
                 }
             )
 
-    fresh = []
-    for d in docs:
-        source = session.get(Source, d.source_id) if d.source_id else None
-        updated = source.last_synced_at if source else d.uploaded_at
-        days = source.freshness_days if source else 30
-        fresh.append(updated is not None and (now() - updated).days <= days)
-    metric("freshness", "Sources up to date", sum(fresh) / len(fresh) if fresh else None)
+    fresh = [entry["fresh"] for entry in inputs["freshness_inputs"]]
+    metric(
+        "freshness",
+        "Sources up to date",
+        sum(fresh) / len(fresh) if fresh and all(value is not None for value in fresh) else None,
+    )
     metric(
         "extraction",
         "Documents readable",

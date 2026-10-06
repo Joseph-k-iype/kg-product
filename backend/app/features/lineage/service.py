@@ -17,6 +17,14 @@ def lineage(session, product_id, release_id=None, revision_id=None):
     )
     if release and release.product_id != product_id:
         raise HTTPException(404, "Release not found")
+    if not release and revision_id:
+        selected = revision(session, product_id, revision_id)
+        if selected.state == "published":
+            release = session.scalars(
+                select(Release).where(Release.product_id == product_id, Release.revision_id == selected.id)
+            ).first()
+            if not release:
+                raise HTTPException(409, "Published revision has no release manifest")
     rev = revision(session, product_id, release.revision_id if release else revision_id)
     inputs = release.manifest if release else snapshot(session, rev)
     nodes = {}

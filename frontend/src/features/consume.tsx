@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Plus, Link2, ArrowRight } from "lucide-react";
 import { api, useData } from "../api/client";
 import type { Retrieval, Hit, Release, Consumer } from "../api/types";
@@ -21,9 +21,7 @@ export function RetrievalPage() {
   );
   const [query, setQuery] = useState(""),
     [mode, setMode] = useState("vector"),
-    [version, setVersion] = useState(
-      readonly ? product.active_release_id || "draft" : "draft",
-    ),
+    [version, setVersion] = useState(readonly ? "" : "draft"),
     [limit, setLimit] = useState(Number(revision.config.limit) || 5),
     [result, setResult] = useState<Retrieval | null>(null),
     [selected, setSelected] = useState(0);
@@ -45,6 +43,11 @@ export function RetrievalPage() {
       setResult(value);
       setSelected(0);
     });
+  useEffect(() => {
+    if (readonly && !version && releases) {
+      setVersion(releases.find((r) => r.revision_id === revision.id)?.id || "");
+    }
+  }, [readonly, version, releases, revision.id]);
   const hit = result?.results[selected];
   return (
     <>

@@ -38,6 +38,9 @@ export function ExplorerPage() {
     selected ? neighborPath : null,
   );
   const { busy, run } = useNotice();
+  const flagPath = scoped(
+    "entities/" + encodeURIComponent(selected?.id || "") + "/flags",
+  );
   return (
     <>
       <div className="guidance">
@@ -211,15 +214,7 @@ export function ExplorerPage() {
               style={{ marginTop: 12 }}
               onClick={() =>
                 run("Correction flagged for review", async () => {
-                  await api(
-                    "/products/" +
-                      product.id +
-                      "/entities/" +
-                      encodeURIComponent(selected.id) +
-                      "/flags",
-                    "POST",
-                    { reason },
-                  );
+                  await api(flagPath, "POST", { reason });
                   setReason("");
                 })
               }

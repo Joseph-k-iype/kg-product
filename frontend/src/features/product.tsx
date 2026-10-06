@@ -73,7 +73,7 @@ export function Workspace({
     if (id) sessionStorage.setItem("currentProduct", id);
     setSelected("");
   }, [id]);
-  if (loading) return <Loading />;
+  if (loading || (data && data.id !== id)) return <Loading />;
   if (error || !data)
     return <ErrorState message={error || "Product unavailable"} />;
   const rev =
@@ -95,7 +95,10 @@ export function Workspace({
     releases: <ReleasesPage />,
   };
   return (
-    <ProductContext.Provider value={{ product: data, revision: rev, readonly }}>
+    <ProductContext.Provider
+      key={data.id + ":" + rev.id}
+      value={{ product: data, revision: rev, readonly }}
+    >
       <PageTitle
         eyebrow="KNOWLEDGE PRODUCT"
         title={data.name}

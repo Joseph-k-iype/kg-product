@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FileText, FileUp, Plus, RefreshCw, ArrowRight } from "lucide-react";
 import { api, useData } from "../api/client";
-import type { DocumentRecord, Source, Catalog } from "../api/types";
+import type { DocumentRecord, Source, Catalog, Job } from "../api/types";
 import {
   Block,
   Field,
@@ -319,10 +319,10 @@ export function DocumentDrawer({
 export function ProcessingPage() {
   const { product, readonly } = useProduct();
   const path = scoped("processing");
-  const { data, error, loading } = useData<{ documents: DocumentRecord[] }>(
-    path,
-    2000,
-  );
+  const { data, error, loading } = useData<{
+    documents: DocumentRecord[];
+    revision_jobs: Job[];
+  }>(path, 2000);
   const { busy, run } = useNotice();
   const [selected, setSelected] = useState<string | null>(null);
   return (
@@ -411,6 +411,51 @@ export function ProcessingPage() {
           />
         )}
       </Block>
+      {data?.revision_jobs?.length ? (
+        <Block
+          title="Fact preparation"
+          subtitle="Revision-level processing, errors, and attempt history."
+        >
+          {data.revision_jobs.map((job) => (
+            <div className="checklist-row" key={job.id}>
+              <span className="round-icon">
+                <RefreshCw />
+              </span>
+              <div>
+                <h3>Prepare supported facts</h3>
+                <p>
+                  Attempt {job.attempt_count} · <Status value={job.state} />
+                </p>
+                {job.error && (
+                  <div className="error" role="alert">
+                    {job.error}
+                  </div>
+                )}
+                <details>
+                  <summary>Attempt history</summary>
+                  {job.attempts.map((a) => (
+                    <p key={a.number}>
+                      Attempt {a.number}: {a.state} · {a.error || a.started_at}
+                    </p>
+                  ))}
+                </details>
+              </div>
+              {job.state === "failed" && !readonly && (
+                <button
+                  disabled={busy}
+                  onClick={() =>
+                    run("Fact preparation retry queued", () =>
+                      api("/jobs/" + job.id + "/retry", "POST"),
+                    )
+                  }
+                >
+                  Retry failed stage
+                </button>
+              )}
+            </div>
+          ))}
+        </Block>
+      ) : null}
       <div className="grid-3">
         <Block title="Readable documents">
           <div className="block-body">

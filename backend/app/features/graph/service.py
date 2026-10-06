@@ -1,3 +1,4 @@
+from uuid import uuid5, NAMESPACE_URL
 import json, re
 from hashlib import sha256
 from sqlalchemy import select
@@ -133,7 +134,24 @@ def build_graph(session, rev):
             previous["evidence"] += edge["evidence"]
         else:
             merged[key] = edge
-    id = existing.id if existing else uid()
+    # Identity survives metadata rollback after external writes; MERGE resumes partial artifacts.
+    id = (
+        existing.id
+        if existing
+        else str(
+            uuid5(
+                NAMESPACE_URL,
+                settings.database_url.rsplit("/", 1)[-1]
+                + "/"
+                + rev.product_id
+                + "/"
+                + rev.id
+                + "/"
+                + fingerprint
+                + "/fixture-rules-v1",
+            )
+        )
+    )
     build = existing or GraphBuild(
         id=id,
         product_id=rev.product_id,
@@ -184,7 +202,13 @@ def resolve_build(session, rev, release=None):
             409, {"code": "facts_not_prepared", "message": "Prepare knowledge to explore its facts."}
         )
     build = require(session, GraphBuild, id)
-    if build.revision_id != rev.id or build.state != "ready":
+    if (
+        build.revision_id != rev.id
+        or build.product_id != rev.product_id
+        or build.state != "ready"
+        or build.ontology_id != rev.ontology_id
+        or build.mapping_id != rev.mapping_id
+    ):
         raise HTTPException(409, "Fact build is unavailable")
     return build
 

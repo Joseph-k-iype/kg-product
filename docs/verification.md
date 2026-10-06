@@ -4,8 +4,8 @@ Date: October 6, 2026. All results below refer to this implementation worktree; 
 
 | Check | Executed result |
 |---|---|
-| Backend integration and real-model acceptance | 28 tests passed in the latest pre-review run; PostgreSQL/pgvector, MinIO, FalkorDB, RDFLib, pySHACL, and the pinned local model were exercised. |
-| Browser workflows | Four Playwright tests passed: creation/reload, all primary destinations, dashboard accessibility plus 390px overflow/navigation, and creation through preparation/checks/review/publication/cited retrieval. |
+| Backend integration and real-model acceptance | 34 tests passed after the independent-review fix pass; PostgreSQL/pgvector, MinIO, FalkorDB, RDFLib, pySHACL, and the pinned local model were exercised. |
+| Browser workflows | Six Playwright tests cover: creation/reload, all primary destinations, dashboard accessibility plus 390px overflow/navigation, creation through preparation/checks/review/publication/cited retrieval, clearing search evidence on product switch, and flagging the inspected published version. |
 | Frontend production build | TypeScript and Vite passed. |
 | Fresh migration chain | Alembic 001–008 applied successfully to a blank `knowledge_migration_check` database. |
 | Source formats | Text, PDF, and DOCX originals retrieved byte-for-byte and extracted into cited excerpts; active HTML cannot be served from a text upload. |
@@ -19,3 +19,13 @@ The backend acceptance journey used actual 384-dimensional model vectors and sem
 Container image verification and final independent review results are recorded after completion below. CPU-only PyTorch is selected for Linux so a local MVP does not download CUDA libraries.
 
 Limits: this is a local single-workspace MVP with synthetic identities, fixture-backed fact extraction, registered external sources, and simulated consumer usage. Production authentication, live external connectors, unrestricted OWL reasoning, remote SPARQL, and generated LLM answers are intentionally outside scope. Browser tests add inspectable QA products to the live demo; backend tests use a separate database.
+
+## Final independent review and container validation
+
+One fresh reviewer inspected the whole branch and found eight Important issues and one Minor issue. All eight Important issues were reproduced with failing tests and fixed. The backend regression suite now covers metadata re-preparation, revision locking during a concurrent edit, freshness expiry, revision-level job failures/retries, published-release lineage, and recovery after an external graph write followed by DB rollback. Browser regressions cover search-context reset and correction-version scoping. The full backend suite passed 34/34 after the fixes.
+
+The Docker image built successfully with torch 2.9.1+cpu. A container connected to all three storage services and loaded the pinned local model, verifying an actual 384-dimensional embedding. CUDA is absent from that image. Fresh migrations and host runtime checks were also executed.
+
+Deferred Minor: impact previews could list more historical shape/evaluation/release dependencies. Current previews expose facts/mappings and required rebuild/check/review steps, and preserve published artifacts.
+
+Final full browser run: **6/6 passed** after context and correction fixes. Final backend run: **34/34 passed**. Frontend production build passed. The final container image was rebuilt with the corrected application source.

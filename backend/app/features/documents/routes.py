@@ -73,11 +73,27 @@ def retry(id: str, session=Depends(get_session)):
 def processing(id: str, revision_id: str | None = None, session=Depends(get_session)):
     rev = revision(session, id, revision_id)
     docs = session.scalars(select(Document).where(Document.revision_id == rev.id)).all()
+    from app.features.processing.models import Job
+
+    revision_jobs = session.scalars(
+        select(Job).where(Job.revision_id == rev.id, Job.document_id.is_(None)).order_by(Job.created_at)
+    ).all()
     return {
         "revision_id": rev.id,
         "generation": rev.generation,
         "stages": service.STAGES,
         "documents": [service.document_detail(session, d) for d in docs],
+        "revision_jobs": [
+            {
+                "id": j.id,
+                "stage": j.stage,
+                "state": j.state,
+                "attempt_count": j.attempt_count,
+                "attempts": j.attempts,
+                "error": j.error,
+            }
+            for j in revision_jobs
+        ],
     }
 
 
@@ -128,6 +144,6 @@ def queue_graph(session, rev):
     if not existing:
         job = Job(product_id=rev.product_id, revision_id=rev.id, stage="graph_built", input_hash=key)
         session.add(job)
-    elif existing.state == "failed":
+    elif existing.state == "failed" or (existing.state == "ready" and not rev.graph_build_id):
         existing.state = "queued"
         existing.error = None

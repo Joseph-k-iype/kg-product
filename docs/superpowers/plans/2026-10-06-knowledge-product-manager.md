@@ -54,7 +54,7 @@ For each task write the named assertions first, run its tests to observe failure
 
 **Interfaces:** Produces create_product(session, input: ProductCreate) -> ProductDetail; open_draft(session, product_id: UUID) -> RevisionRef; update_draft(session, ref: RevisionRef, input: ProductUpdate) -> ProductDetail. ProductDetail includes owner, purpose, domain, tags, active release, draft state, and readiness. GET/POST /products, GET/PATCH /products/{id}, POST /products/{id}/draft; GET /health.
 
-- [ ] **Step 1: Write failing tests in `tests/integration/test_products.py` with these assertions.**
+- [x] **Step 1: Write failing tests in `tests/integration/test_products.py` with these assertions.**
 
 ```python
 assert create_then_reload.name == "Customer Complaints"
@@ -64,10 +64,10 @@ assert catalog_combined_filters.total == 1
 assert health.probes == {"postgres": "ready", "minio": "ready", "falkordb": "ready"}
 ```
 
-- [ ] **Step 2: Run `.venv/bin/python -m pytest tests/integration/test_products.py -v`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
-- [ ] **Step 3: Implement the interfaces in the listed files.** Create service configuration, Compose health checks, migrations with vector extension, revisions and activity records. Configure catalog pagination/search/filter/sort. Scaffold API and integration fixtures; persist incomplete drafts. Seed synthetic identities and initial product fixtures.
-- [ ] **Step 4: Run `.venv/bin/python -m pytest tests/integration/test_products.py -v`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
-- [ ] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: foundation and revision persistence`. Record executed checks and any blockers before moving forward.
+- [x] **Step 2: Run `.venv/bin/python -m pytest tests/integration/test_products.py -v`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
+- [x] **Step 3: Implement the interfaces in the listed files.** Create service configuration, Compose health checks, migrations with vector extension, revisions and activity records. Configure catalog pagination/search/filter/sort. Scaffold API and integration fixtures; persist incomplete drafts. Seed synthetic identities and initial product fixtures.
+- [x] **Step 4: Run `.venv/bin/python -m pytest tests/integration/test_products.py -v`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
+- [x] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: foundation and revision persistence`. Record executed checks and any blockers before moving forward.
 
 ### Task 2: Document storage, provenance, and recoverable jobs
 
@@ -75,7 +75,7 @@ assert health.probes == {"postgres": "ready", "minio": "ready", "falkordb": "rea
 
 **Interfaces:** Consumes RevisionRef. Produces upload_document(session, ref: RevisionRef, file: UploadInput) -> DocumentDetail; enqueue_stage(session, ref: RevisionRef, document_id: UUID, stage: str) -> JobDetail; run_once(worker_id: str) -> bool. ObjectStore.put(data: bytes, content_type: str) -> ArtifactRef; ObjectStore.get(ref: ArtifactRef) -> bytes. GET/POST /sources; POST /sources/{id}/sync-fixture; POST /products/{id}/documents; GET /documents/{id}; GET /documents/{id}/original; POST /jobs/{id}/retry; GET /products/{id}/processing.
 
-- [ ] **Step 1: Write failing tests in `tests/integration/test_documents.py` with these assertions.**
+- [x] **Step 1: Write failing tests in `tests/integration/test_documents.py` with these assertions.**
 
 ```python
 assert downloaded_bytes == uploaded_bytes
@@ -87,10 +87,10 @@ assert empty_upload.status_code == 422
 assert external_source.connection_state == "registered"
 ```
 
-- [ ] **Step 2: Run `.venv/bin/python -m pytest tests/integration/test_documents.py -v`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
-- [ ] **Step 3: Implement the interfaces in the listed files.** Implement immutable MinIO uploads, PDF/DOCX/text extraction and deterministic chunks. Persist stage attempts, leased row-lock claims, input fingerprints and artifact uniqueness. Simulate an interrupted worker in tests. Add source freshness and product associations. Record artifact/document/revision/processing provenance throughout.
-- [ ] **Step 4: Run `.venv/bin/python -m pytest tests/integration/test_documents.py -v`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
-- [ ] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: document storage, provenance, and recoverable jobs`. Record executed checks and any blockers before moving forward.
+- [x] **Step 2: Run `.venv/bin/python -m pytest tests/integration/test_documents.py -v`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
+- [x] **Step 3: Implement the interfaces in the listed files.** Implement immutable MinIO uploads, PDF/DOCX/text extraction and deterministic chunks. Persist stage attempts, leased row-lock claims, input fingerprints and artifact uniqueness. Simulate an interrupted worker in tests. Add source freshness and product associations. Record artifact/document/revision/processing provenance throughout.
+- [x] **Step 4: Run `.venv/bin/python -m pytest tests/integration/test_documents.py -v`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
+- [x] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: document storage, provenance, and recoverable jobs`. Record executed checks and any blockers before moving forward.
 
 ### Task 3: Versioned RDF ontology, shapes, and explicit mappings
 
@@ -98,7 +98,7 @@ assert external_source.connection_state == "registered"
 
 **Interfaces:** Consumes RevisionRef and ObjectStore. Produces save_ontology(session, ref: RevisionRef, edit: OntologyEdit) -> OntologyVersion; import_ontology(session, ref: RevisionRef, turtle: str, mode: str, impact_token: str | None) -> OntologyVersion; save_mapping(session, ref: RevisionRef, input: MappingInput) -> MappingVersion; inspect_impact(session, ref: RevisionRef, iri: str) -> ImpactDetail. OntologyAdapter.parse(turtle: str) -> OntologyDocument; validate(ontology: str, shapes: str, instances: str) -> list[Finding]. GET/PATCH /products/{id}/ontology; POST /ontology/import; GET /ontology/export; POST /ontology/impact; PUT /ontology/mapping, scoped by product revision.
 
-- [ ] **Step 1: Write failing tests in `tests/integration/test_ontology.py` with these assertions.**
+- [x] **Step 1: Write failing tests in `tests/integration/test_ontology.py` with these assertions.**
 
 ```python
 assert graph_isomorphic(imported, exported)
@@ -110,10 +110,10 @@ assert replacement_without_impact.status_code == 409
 assert unsupported_constructs != []
 ```
 
-- [ ] **Step 2: Run `.venv/bin/python -m pytest tests/integration/test_ontology.py -v`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
-- [ ] **Step 3: Implement the interfaces in the listed files.** Use RDFLib and pySHACL; implement class, property, namespaces, supported shape edits and canonical serialization. Store hash/version/object references. Preview merge conflicts and replacement impact, validate mapping kind/domain/range/coverage, and invalidate affected draft builds/evidence. Keep the adapter independent of a future triplestore.
-- [ ] **Step 4: Run `.venv/bin/python -m pytest tests/integration/test_ontology.py -v`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
-- [ ] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: versioned rdf ontology, shapes, and explicit mappings`. Record executed checks and any blockers before moving forward.
+- [x] **Step 2: Run `.venv/bin/python -m pytest tests/integration/test_ontology.py -v`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
+- [x] **Step 3: Implement the interfaces in the listed files.** Use RDFLib and pySHACL; implement class, property, namespaces, supported shape edits and canonical serialization. Store hash/version/object references. Preview merge conflicts and replacement impact, validate mapping kind/domain/range/coverage, and invalidate affected draft builds/evidence. Keep the adapter independent of a future triplestore.
+- [x] **Step 4: Run `.venv/bin/python -m pytest tests/integration/test_ontology.py -v`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
+- [x] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: versioned rdf ontology, shapes, and explicit mappings`. Record executed checks and any blockers before moving forward.
 
 ### Task 4: Compatible embeddings and isolated vector retrieval
 
@@ -121,7 +121,7 @@ assert unsupported_constructs != []
 
 **Interfaces:** Consumes ModelRef, Evidence, RevisionRef, chunk snapshots. Produces EmbeddingProvider.embed(texts: list[str], model: ModelRef) -> list[list[float]]; search_vector(session, ref: RevisionRef, model: ModelRef, query: str, limit: int) -> list[RetrievalHit]. POST /products/{id}/retrieval; GET/PUT /products/{id}/retrieval-config; POST /products/{id}/evaluation-cases.
 
-- [ ] **Step 1: Write failing tests in `tests/integration/test_retrieval.py` with these assertions.**
+- [x] **Step 1: Write failing tests in `tests/integration/test_retrieval.py` with these assertions.**
 
 ```python
 assert len(real_embedding) == 384
@@ -133,10 +133,10 @@ assert cited.text == source_text[cited.start:cited.end]
 assert unavailable_provider.code == "embedding_provider_unavailable"
 ```
 
-- [ ] **Step 2: Run `.venv/bin/python -m pytest tests/integration/test_retrieval.py -v`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
-- [ ] **Step 3: Implement the interfaces in the listed files.** Pin the resolved all-MiniLM-L6-v2 model revision and cache it explicitly. Embed/query using identical model identity and 384-dimensional vectors. Implement filtered pgvector ranking and release/draft resolution; no lexical fallback. Save evaluation cases and detailed retrieval diagnostics. Separate real-provider integration tests from deterministic unit doubles.
-- [ ] **Step 4: Run `.venv/bin/python -m pytest tests/integration/test_retrieval.py -v`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
-- [ ] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: compatible embeddings and isolated vector retrieval`. Record executed checks and any blockers before moving forward.
+- [x] **Step 2: Run `.venv/bin/python -m pytest tests/integration/test_retrieval.py -v`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
+- [x] **Step 3: Implement the interfaces in the listed files.** Pin the resolved all-MiniLM-L6-v2 model revision and cache it explicitly. Embed/query using identical model identity and 384-dimensional vectors. Implement filtered pgvector ranking and release/draft resolution; no lexical fallback. Save evaluation cases and detailed retrieval diagnostics. Separate real-provider integration tests from deterministic unit doubles.
+- [x] **Step 4: Run `.venv/bin/python -m pytest tests/integration/test_retrieval.py -v`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
+- [x] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: compatible embeddings and isolated vector retrieval`. Record executed checks and any blockers before moving forward.
 
 ### Task 5: Scoped instance builds and knowledge exploration
 
@@ -144,7 +144,7 @@ assert unavailable_provider.code == "embedding_provider_unavailable"
 
 **Interfaces:** Consumes RevisionRef, MappingVersion, OntologyVersion, Evidence. Produces GraphAdapter.build(ref: RevisionRef, build_id: UUID, instances: list[InstanceInput], relationships: list[RelationshipInput]) -> GraphBuild; search(build: GraphBuild, query: str, entity_type: str | None, limit: int) -> list[EntityDetail]; neighbors(build: GraphBuild, entity_id: str, limit: int) -> Neighborhood. GET /products/{id}/entities; GET /entities/{id}; GET /entities/{id}/neighbors; POST /entities/{id}/flags.
 
-- [ ] **Step 1: Write failing tests in `tests/integration/test_graph.py` with these assertions.**
+- [x] **Step 1: Write failing tests in `tests/integration/test_graph.py` with these assertions.**
 
 ```python
 assert all(entity.build_id == selected_build for entity in results)
@@ -155,10 +155,10 @@ assert retry.build_id == first.build_id
 assert graph_mode.enabled and hybrid_mode.enabled
 ```
 
-- [ ] **Step 2: Run `.venv/bin/python -m pytest tests/integration/test_graph.py -v`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
-- [ ] **Step 3: Implement the interfaces in the listed files.** Build isolated immutable FalkorDB graphs with explicit fixture rules and mapped vocabulary. Record evidence and extraction version on instances and relationships. Implement bounded lookup and neighborhoods with safe query parameters, review flags, graph retrieval and hybrid evidence expansion. Enable modes only after working adapter integration checks.
-- [ ] **Step 4: Run `.venv/bin/python -m pytest tests/integration/test_graph.py -v`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
-- [ ] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: scoped instance builds and knowledge exploration`. Record executed checks and any blockers before moving forward.
+- [x] **Step 2: Run `.venv/bin/python -m pytest tests/integration/test_graph.py -v`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
+- [x] **Step 3: Implement the interfaces in the listed files.** Build isolated immutable FalkorDB graphs with explicit fixture rules and mapped vocabulary. Record evidence and extraction version on instances and relationships. Implement bounded lookup and neighborhoods with safe query parameters, review flags, graph retrieval and hybrid evidence expansion. Enable modes only after working adapter integration checks.
+- [x] **Step 4: Run `.venv/bin/python -m pytest tests/integration/test_graph.py -v`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
+- [x] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: scoped instance builds and knowledge exploration`. Record executed checks and any blockers before moving forward.
 
 ### Task 6: Quality, current reviews, and atomic release activation
 
@@ -166,7 +166,7 @@ assert graph_mode.enabled and hybrid_mode.enabled
 
 **Interfaces:** Consumes all versioned inputs and adapters. Produces evaluate(session, ref: RevisionRef) -> EvaluationRun; submit_review(session, ref: RevisionRef, summary: str) -> ReviewDetail; decide_review(session, review_id: UUID, decision: str, reason: str, reviewer_id: UUID) -> ReviewDetail; prepare_release(session, ref: RevisionRef) -> ReleaseManifest; activate_release(session, manifest: ReleaseManifest) -> ReleaseDetail. POST /products/{id}/evaluations; GET /reviews; POST /products/{id}/reviews; POST /reviews/{id}/decision; POST /products/{id}/releases.
 
-- [ ] **Step 1: Write failing tests in `tests/integration/test_governance.py` with these assertions.**
+- [x] **Step 1: Write failing tests in `tests/integration/test_governance.py` with these assertions.**
 
 ```python
 assert missing_inputs.state == "insufficient_data"
@@ -178,10 +178,10 @@ assert manifest.ontology_sha256 == evaluated.ontology_sha256
 assert concurrent_activation.status_code == 409
 ```
 
-- [ ] **Step 2: Run `.venv/bin/python -m pytest tests/integration/test_governance.py -v`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
-- [ ] **Step 3: Implement the interfaces in the listed files.** Persist seven separate measured dimensions with thresholds and linked findings. Capture deterministic input fingerprints and diff snapshots. Reject stale approvals, incomplete readiness and generation races. Prepare and verify immutable manifests, then activate using a locked PostgreSQL transaction. Inject storage and graph preparation failures to prove rollback preserves active release.
-- [ ] **Step 4: Run `.venv/bin/python -m pytest tests/integration/test_governance.py -v`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
-- [ ] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: quality, current reviews, and atomic release activation`. Record executed checks and any blockers before moving forward.
+- [x] **Step 2: Run `.venv/bin/python -m pytest tests/integration/test_governance.py -v`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
+- [x] **Step 3: Implement the interfaces in the listed files.** Persist seven separate measured dimensions with thresholds and linked findings. Capture deterministic input fingerprints and diff snapshots. Reject stale approvals, incomplete readiness and generation races. Prepare and verify immutable manifests, then activate using a locked PostgreSQL transaction. Inject storage and graph preparation failures to prove rollback preserves active release.
+- [x] **Step 4: Run `.venv/bin/python -m pytest tests/integration/test_governance.py -v`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
+- [x] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: quality, current reviews, and atomic release activation`. Record executed checks and any blockers before moving forward.
 
 ### Task 7: Consumers, lineage, and actionable overview
 
@@ -189,7 +189,7 @@ assert concurrent_activation.status_code == 409
 
 **Interfaces:** Consumes ReleaseDetail and versioned provenance. Produces resolve_consumer(session, consumer_id: UUID) -> ReleaseDetail; lineage(session, product_id: UUID, release_id: UUID | None) -> LineageGraph; overview(session) -> OverviewDetail. GET/POST/PATCH /consumers; GET /products/{id}/lineage; GET /overview. ConsumerInput supports agent, copilot, API application, dashboard and active/pinned release policies.
 
-- [ ] **Step 1: Write failing tests in `tests/integration/test_consumers.py` with these assertions.**
+- [x] **Step 1: Write failing tests in `tests/integration/test_consumers.py` with these assertions.**
 
 ```python
 assert pinned_after_publish.release_id == pinned_before_publish.release_id
@@ -200,10 +200,10 @@ assert resolved_issue.id not in updated_overview.attention_ids
 assert usage.label == "Simulated demo usage"
 ```
 
-- [ ] **Step 2: Run `.venv/bin/python -m pytest tests/integration/test_consumers.py -v`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
-- [ ] **Step 3: Implement the interfaces in the listed files.** Persist consumer associations and policies. Build lineage from actual artifact references, including ontology/mapping dependencies, with graph and table DTOs. Compute attention actions and readiness from persisted records. Add repeatable seed/reset tooling with explicit project namespace boundaries and synthetic fixtures.
-- [ ] **Step 4: Run `.venv/bin/python -m pytest tests/integration/test_consumers.py -v`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
-- [ ] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: consumers, lineage, and actionable overview`. Record executed checks and any blockers before moving forward.
+- [x] **Step 2: Run `.venv/bin/python -m pytest tests/integration/test_consumers.py -v`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
+- [x] **Step 3: Implement the interfaces in the listed files.** Persist consumer associations and policies. Build lineage from actual artifact references, including ontology/mapping dependencies, with graph and table DTOs. Compute attention actions and readiness from persisted records. Add repeatable seed/reset tooling with explicit project namespace boundaries and synthetic fixtures.
+- [x] **Step 4: Run `.venv/bin/python -m pytest tests/integration/test_consumers.py -v`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
+- [x] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: consumers, lineage, and actionable overview`. Record executed checks and any blockers before moving forward.
 
 ### Task 8: Application shell, catalog, creation, and document workspace
 
@@ -211,7 +211,7 @@ assert usage.label == "Simulated demo usage"
 
 **Interfaces:** Consumes tasks 1, 2 and 7 API DTOs. Produces shared AppShell, typed client, product/revision selectors and route layout; routes /overview, /products, /products/new, /products/:id, /sources. Product tabs route under /products/:id/:tab; search/filter/sort persist in URL.
 
-- [ ] **Step 1: Write failing tests in `frontend/tests/e2e/frontend_core.spec.ts` with these assertions.**
+- [x] **Step 1: Write failing tests in `frontend/tests/e2e/frontend_core.spec.ts` with these assertions.**
 
 ```typescript
 await expect(page.getByText("Draft created")).toBeVisible()
@@ -222,10 +222,10 @@ await expect(page.getByText("Retry failed stage")).toBeEnabled()
 await expect(page.getByLabel("Product lifecycle")).toBeVisible()
 ```
 
-- [ ] **Step 2: Run `npx playwright test tests/e2e/frontend_core.spec.ts`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
-- [ ] **Step 3: Implement the interfaces in the listed files.** Run 12ui draft with at least four concepts, inspect images, choose direction, branch app states with HTML prototype, retain exports as baseline. Implement ten-item shell, overview, catalog filters/sorting, five-step creation allowing incomplete draft, product overview and tabs, source registration/fixture sync, upload/detail split pane, stage monitor/retry and activity. Provide accessible responsive states; wire all actions to persistence.
-- [ ] **Step 4: Run `npx playwright test tests/e2e/frontend_core.spec.ts`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
-- [ ] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: application shell, catalog, creation, and document workspace`. Record executed checks and any blockers before moving forward.
+- [x] **Step 2: Run `npx playwright test tests/e2e/frontend_core.spec.ts`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
+- [x] **Step 3: Implement the interfaces in the listed files.** Run 12ui draft with at least four concepts, inspect images, choose direction, branch app states with HTML prototype, retain exports as baseline. Implement ten-item shell, overview, catalog filters/sorting, five-step creation allowing incomplete draft, product overview and tabs, source registration/fixture sync, upload/detail split pane, stage monitor/retry and activity. Provide accessible responsive states; wire all actions to persistence.
+- [x] **Step 4: Run `npx playwright test tests/e2e/frontend_core.spec.ts`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
+- [x] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: application shell, catalog, creation, and document workspace`. Record executed checks and any blockers before moving forward.
 
 ### Task 9: Semantic, explorer, governance, retrieval, and lineage interfaces
 
@@ -233,7 +233,7 @@ await expect(page.getByLabel("Product lifecycle")).toBeVisible()
 
 **Interfaces:** Consumes tasks 3–7 APIs and task 8 components. Produces remaining primary routes /ontology, /explorer, /health, /reviews, /retrieval, /lineage, /consumers and matching product tabs.
 
-- [ ] **Step 1: Write failing tests in `frontend/tests/e2e/frontend_workflows.spec.ts` with these assertions.**
+- [x] **Step 1: Write failing tests in `frontend/tests/e2e/frontend_workflows.spec.ts` with these assertions.**
 
 ```typescript
 await expect(page.getByText("Exactly one complaint identifier")).toBeVisible()
@@ -244,10 +244,10 @@ await expect(page.getByRole("button", {name:"Publish"})).toBeDisabled()
 await expect(page.getByText("Pinned release")).toBeVisible()
 ```
 
-- [ ] **Step 2: Run `npx playwright test tests/e2e/frontend_workflows.spec.ts`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
-- [ ] **Step 3: Implement the interfaces in the listed files.** Extend approved 12ui states for three-pane ontology editor and RDF import/export/mapping/shape views, instance canvas plus table/drawer, health metrics and findings, review diffs/decisions, release activity, retrieval modes/evidence/diagnostics/saved cases, lineage graph/table and consumers. Implement destructive-change previews and focus management. Compare each completed route against its approved image using 12ui improve --target, apply kits and inspect wide/narrow layouts.
-- [ ] **Step 4: Run `npx playwright test tests/e2e/frontend_workflows.spec.ts`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
-- [ ] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: semantic, explorer, governance, retrieval, and lineage interfaces`. Record executed checks and any blockers before moving forward.
+- [x] **Step 2: Run `npx playwright test tests/e2e/frontend_workflows.spec.ts`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
+- [x] **Step 3: Implement the interfaces in the listed files.** Extend approved 12ui states for three-pane ontology editor and RDF import/export/mapping/shape views, instance canvas plus table/drawer, health metrics and findings, review diffs/decisions, release activity, retrieval modes/evidence/diagnostics/saved cases, lineage graph/table and consumers. Implement destructive-change previews and focus management. Compare each completed route against its approved image using 12ui improve --target, apply kits and inspect wide/narrow layouts.
+- [x] **Step 4: Run `npx playwright test tests/e2e/frontend_workflows.spec.ts`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
+- [x] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: semantic, explorer, governance, retrieval, and lineage interfaces`. Record executed checks and any blockers before moving forward.
 
 ### Task 10: Full acceptance journey and delivery documentation
 
@@ -255,7 +255,7 @@ await expect(page.getByText("Pinned release")).toBeVisible()
 
 **Interfaces:** Consumes all prior contracts. Produces documented commands make up, migrate, seed, test, test-integration, test-e2e, reset, and dev; local preview URL and verification report.
 
-- [ ] **Step 1: Write failing tests in `tests/acceptance/test_release_journey.py` with these assertions.**
+- [x] **Step 1: Write failing tests in `tests/acceptance/test_release_journey.py` with these assertions.**
 
 ```python
 assert created_product.reload().id == created_product.id
@@ -267,10 +267,10 @@ await expect(page.getByText("Published release")).toBeVisible()
 await expect(page.getByRole("link", {name:"Open source"})).toBeVisible()
 ```
 
-- [ ] **Step 2: Run `.venv/bin/python -m pytest tests/acceptance/test_release_journey.py -v`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
-- [ ] **Step 3: Implement the interfaces in the listed files.** Run all 15 acceptance cases from spec section 18 against real services, plus browser creation→upload→ontology/mapping→processing→evaluation→review→publication→retrieval. Verify restart persistence and reset reproducibility. Document adapter extension points, supported constraints, local model installation, fixture provenance, service failures and demo identity limitations. Start local preview and verify routes; record exact test outcomes and unresolved blockers without claiming unexecuted checks passed.
-- [ ] **Step 4: Run `.venv/bin/python -m pytest tests/acceptance/test_release_journey.py -v`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
-- [ ] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: full acceptance journey and delivery documentation`. Record executed checks and any blockers before moving forward.
+- [x] **Step 2: Run `.venv/bin/python -m pytest tests/acceptance/test_release_journey.py -v`.** Expect the named tests to fail because the behavior is absent; infrastructure setup failures do not count as a meaningful red test.
+- [x] **Step 3: Implement the interfaces in the listed files.** Run all 15 acceptance cases from spec section 18 against real services, plus browser creation→upload→ontology/mapping→processing→evaluation→review→publication→retrieval. Verify restart persistence and reset reproducibility. Document adapter extension points, supported constraints, local model installation, fixture provenance, service failures and demo identity limitations. Start local preview and verify routes; record exact test outcomes and unresolved blockers without claiming unexecuted checks passed.
+- [x] **Step 4: Run `.venv/bin/python -m pytest tests/acceptance/test_release_journey.py -v`.** Expect all task assertions to pass; also run preceding task tests when their contracts change.
+- [x] **Step 5: Review the diff and commit only this task's files.** Use commit message `feat: full acceptance journey and delivery documentation`. Record executed checks and any blockers before moving forward.
 
 ## Acceptance coverage
 
