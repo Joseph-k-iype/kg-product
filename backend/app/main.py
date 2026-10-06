@@ -48,3 +48,12 @@ app.include_router(reviews_router)
 
 from app.features.releases.routes import router as releases_router
 app.include_router(releases_router)
+
+from app.features.consumers.routes import router as consumers_router
+app.include_router(consumers_router)
+
+from app.features.lineage.routes import router as lineage_router
+app.include_router(lineage_router)
+
+from app.features.overview.routes import router as overview_router
+app.include_router(overview_router)
