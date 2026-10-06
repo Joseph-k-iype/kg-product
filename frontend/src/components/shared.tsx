@@ -36,6 +36,8 @@ const labels: Record<string, string> = {
   needs_preparation: "Needs preparation",
   fixture_synced: "Demo sync completed",
   registered: "Registered source",
+  connected: "Connected · snapshot imported",
+  definitions_ready: "Definitions imported",
   local_upload: "Local uploads",
   uploaded: "Uploaded",
   extracted: "Text ready",

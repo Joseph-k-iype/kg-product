@@ -23,8 +23,14 @@ def overview(session):
         rev = session.scalars(
             select(Revision).where(Revision.product_id == p.id).order_by(Revision.number.desc())
         ).first()
-        docs = session.scalars(select(Document).where(Document.revision_id == rev.id)).all()
-        chunks = session.scalars(select(Chunk).where(Chunk.revision_id == rev.id)).all()
+        docs = session.scalars(
+            select(Document).where(
+                Document.revision_id == rev.id, Document.active.is_(True), Document.data_kind != "definitions"
+            )
+        ).all()
+        chunks = session.scalars(
+            select(Chunk).join(Document).where(Chunk.revision_id == rev.id, Document.active.is_(True))
+        ).all()
         ready = sum(
             bool(d.extracted_text)
             and all(c.embedding is not None for c in chunks if c.document_id == d.id)

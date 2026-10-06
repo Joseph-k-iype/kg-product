@@ -39,9 +39,19 @@ def source_freshness(session, docs):
 
 def snapshot(session, rev):
     product = require(session, Product, rev.product_id)
-    docs = session.scalars(select(Document).where(Document.revision_id == rev.id).order_by(Document.id)).all()
-    chunks = session.scalars(select(Chunk).where(Chunk.revision_id == rev.id).order_by(Chunk.id)).all()
+    docs = session.scalars(
+        select(Document)
+        .where(Document.revision_id == rev.id, Document.active.is_(True))
+        .order_by(Document.id)
+    ).all()
+    chunks = session.scalars(
+        select(Chunk)
+        .join(Document)
+        .where(Chunk.revision_id == rev.id, Document.active.is_(True))
+        .order_by(Chunk.id)
+    ).all()
     ontology = session.get(OntologyVersion, rev.ontology_id) if rev.ontology_id else None
+    definitions = details(session, rev)
     return {
         "product_id": rev.product_id,
         "revision_id": rev.id,
@@ -58,9 +68,7 @@ def snapshot(session, rev):
         "ontology_sha256": ontology.sha256 if ontology else None,
         "mapping_id": rev.mapping_id,
         "graph_build_id": rev.graph_build_id,
-        "definitions": {
-            key: details(session, rev)[key] for key in ["classes", "properties", "shapes", "namespaces"]
-        },
+        "definitions": {key: definitions[key] for key in ["classes", "properties", "shapes", "namespaces"]},
         "mapping_definition": session.get(MappingVersion, rev.mapping_id).definition
         if rev.mapping_id
         else None,
@@ -115,8 +123,12 @@ def run_detail(session, run, rev):
 
 def evaluate(session, rev):
     inputs = snapshot(session, rev)
-    docs = session.scalars(select(Document).where(Document.revision_id == rev.id)).all()
-    chunks = session.scalars(select(Chunk).where(Chunk.revision_id == rev.id)).all()
+    docs = session.scalars(
+        select(Document).where(Document.revision_id == rev.id, Document.active.is_(True))
+    ).all()
+    chunks = session.scalars(
+        select(Chunk).join(Document).where(Chunk.revision_id == rev.id, Document.active.is_(True))
+    ).all()
     ontology = details(session, rev)
     build = session.get(GraphBuild, rev.graph_build_id) if rev.graph_build_id else None
     metrics = []
@@ -197,10 +209,25 @@ def evaluate(session, rev):
             keys = {p["key"]: p["iri"] for p in mapping["properties"] if p["kind"] == "datatype"}
             for n in build.instances:
                 subject = URIRef(n["iri"])
-                graph.add((subject, RDF.type, URIRef(n["class_iri"])))
+                for class_iri in n.get("class_iris", [n["class_iri"]]):
+                    graph.add((subject, RDF.type, URIRef(class_iri)))
                 for key, value in n["attributes"].items():
                     if key in keys:
-                        graph.add((subject, URIRef(keys[key]), Literal(value, datatype=XSD.string)))
+                        if key in n.get("attribute_terms", {}):
+                            for term in n["attribute_terms"][key]:
+                                graph.add(
+                                    (
+                                        subject,
+                                        URIRef(keys[key]),
+                                        Literal(
+                                            term["value"],
+                                            datatype=URIRef(term["datatype"]) if term["datatype"] else None,
+                                            lang=term["language"],
+                                        ),
+                                    )
+                                )
+                        else:
+                            graph.add((subject, URIRef(keys[key]), Literal(value, datatype=XSD.string)))
             for r in build.relationships:
                 a = next(n for n in build.instances if n["id"] == r["source"])
                 b = next(n for n in build.instances if n["id"] == r["target"])

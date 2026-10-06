@@ -1,4 +1,4 @@
-from sqlalchemy import String, Integer, ForeignKey, DateTime, UniqueConstraint, Boolean
+from sqlalchemy import String, Integer, ForeignKey, DateTime, UniqueConstraint, Boolean, JSON
 from sqlalchemy.orm import Mapped, mapped_column
 from pgvector.sqlalchemy import Vector
 from app.db import Base
@@ -13,6 +13,9 @@ class Document(Base):
     revision_id: Mapped[str] = mapped_column(ForeignKey("revisions.id"))
     source_id: Mapped[str | None] = mapped_column(ForeignKey("sources.id"), nullable=True)
     name: Mapped[str] = mapped_column(String)
+    data_kind: Mapped[str] = mapped_column(String, default="document")
+    structured_data: Mapped[dict] = mapped_column(JSON, default=dict)
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
     content_type: Mapped[str] = mapped_column(String)
     object_key: Mapped[str] = mapped_column(String)
     sha256: Mapped[str] = mapped_column(String(64))

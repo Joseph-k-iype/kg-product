@@ -6,5 +6,5 @@ router = APIRouter(prefix="/api")
 
 
 @router.get("/overview")
-def get(session=Depends(get_session)):
+def get(session=Depends(get_session, scope="function")):
     return overview(session)

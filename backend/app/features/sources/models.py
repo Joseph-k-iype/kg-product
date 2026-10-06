@@ -12,6 +12,7 @@ class Source(Base):
     type: Mapped[str] = mapped_column(String, default="local")
     owner: Mapped[str] = mapped_column(String)
     location: Mapped[str] = mapped_column(String, default="")
+    config: Mapped[dict] = mapped_column(JSON, default=dict)
     freshness_days: Mapped[int] = mapped_column(Integer, default=30)
     product_ids: Mapped[list] = mapped_column(JSON, default=list)
     connection_state: Mapped[str] = mapped_column(String, default="registered")

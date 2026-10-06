@@ -21,7 +21,7 @@ class DecisionInput(BaseModel):
 
 
 @router.get("/reviews")
-def reviews(product_id: str | None = None, session=Depends(get_session)):
+def reviews(product_id: str | None = None, session=Depends(get_session, scope="function")):
     query = select(Review).order_by(Review.created_at.desc())
     if product_id:
         query = query.where(Review.product_id == product_id)
@@ -29,10 +29,10 @@ def reviews(product_id: str | None = None, session=Depends(get_session)):
 
 
 @router.post("/products/{id}/reviews")
-def submit(id: str, input: SubmitInput, revision_id: str | None = None, session=Depends(get_session)):
+def submit(id: str, input: SubmitInput, revision_id: str | None = None, session=Depends(get_session, scope="function")):
     return service.submit_review(session, revision(session, id, revision_id, lock=True), input.summary)
 
 
 @router.post("/reviews/{id}/decision")
-def decide(id: str, input: DecisionInput, session=Depends(get_session)):
+def decide(id: str, input: DecisionInput, session=Depends(get_session, scope="function")):
     return service.decide_review(session, id, input.decision, input.reason, input.reviewer_id)

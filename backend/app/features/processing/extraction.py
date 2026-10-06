@@ -13,7 +13,9 @@ def extract(session, doc):
         return
     data = ObjectStore().get(ArtifactRef(doc.object_key, doc.sha256, doc.sha256))
     extension = Path(doc.name).suffix.lower()
-    if extension == ".pdf":
+    if doc.data_kind in ("csv", "json", "turtle"):
+        text = "\n".join(record["text"] for record in doc.structured_data["records"])
+    elif extension == ".pdf":
         text = "\n".join(page.extract_text() or "" for page in PdfReader(BytesIO(data)).pages)
     elif extension == ".docx":
         text = "\n".join(p.text for p in WordDocument(BytesIO(data)).paragraphs)
@@ -30,8 +32,21 @@ def extract(session, doc):
 def chunk(session, doc):
     if not doc.extracted_text:
         raise ValueError("Extract document text first.")
-    for ordinal, start in enumerate(range(0, len(doc.extracted_text), 720)):
-        end = min(start + 800, len(doc.extracted_text))
+    if doc.data_kind == "definitions":
+        return
+    spans = []
+    if doc.data_kind in ("csv", "json", "turtle"):
+        start = 0
+        for record in doc.structured_data["records"]:
+            end = start + len(record["text"])
+            spans.append((start, end))
+            start = end + 1
+    else:
+        spans = [
+            (start, min(start + 800, len(doc.extracted_text)))
+            for start in range(0, len(doc.extracted_text), 720)
+        ]
+    for ordinal, (start, end) in enumerate(spans):
         existing = session.scalars(
             select(Chunk).where(
                 Chunk.document_id == doc.id,

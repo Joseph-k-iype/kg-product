@@ -6,5 +6,5 @@ router = APIRouter(prefix="/api")
 
 
 @router.get("/products/{id}/lineage")
-def get(id: str, release_id: str | None = None, revision_id: str | None = None, session=Depends(get_session)):
+def get(id: str, release_id: str | None = None, revision_id: str | None = None, session=Depends(get_session, scope="function")):
     return lineage(session, id, release_id, revision_id)

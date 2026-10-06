@@ -45,9 +45,13 @@ def run_once(worker_id: str) -> bool:
             # Revision-before-job is the mutation lock order used by API preparation and edits.
             rev = session.scalars(select(Revision).where(Revision.id == revision_id).with_for_update()).one()
             job = session.scalars(select(Job).where(Job.id == job_id).with_for_update()).one()
-            if job.attempt_count != attempt:
+            if job.attempt_count != attempt or job.state != "running":
                 return True
             doc = session.get(Document, job.document_id) if job.document_id else None
+            if doc and not doc.active:
+                job.state = "superseded"
+                session.commit()
+                return True
             if rev.state == "published":
                 raise ValueError("Published revision is read-only.")
             if job.stage == "extracted":
@@ -65,8 +69,12 @@ def run_once(worker_id: str) -> bool:
                 from app.features.documents.models import Chunk
                 from app.features.documents.routes import queue_graph
 
-                all_docs = session.scalars(select(Document).where(Document.revision_id == rev.id)).all()
-                all_chunks = session.scalars(select(Chunk).where(Chunk.revision_id == rev.id)).all()
+                all_docs = session.scalars(
+                    select(Document).where(Document.revision_id == rev.id, Document.active.is_(True))
+                ).all()
+                all_chunks = session.scalars(
+                    select(Chunk).join(Document).where(Chunk.revision_id == rev.id, Document.active.is_(True))
+                ).all()
                 if (
                     all_docs
                     and all(d.extracted_text for d in all_docs)
@@ -81,7 +89,9 @@ def run_once(worker_id: str) -> bool:
                 from app.features.evaluations.service import evaluate
 
                 evaluate(session, rev)
-                for document in session.scalars(select(Document).where(Document.revision_id == rev.id)):
+                for document in session.scalars(
+                    select(Document).where(Document.revision_id == rev.id, Document.active.is_(True))
+                ):
                     document.state = "validated"
             else:
                 raise ValueError("Unknown processing stage")

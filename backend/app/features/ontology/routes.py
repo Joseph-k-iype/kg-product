@@ -8,29 +8,29 @@ router = APIRouter(prefix="/api/products/{id}/ontology")
 
 
 @router.get("")
-def get(id: str, revision_id: str | None = None, session=Depends(get_session)):
+def get(id: str, revision_id: str | None = None, session=Depends(get_session, scope="function")):
     return service.details(session, revision(session, id, revision_id))
 
 
 @router.patch("")
-def edit(id: str, input: OntologyEdit, revision_id: str | None = None, session=Depends(get_session)):
+def edit(id: str, input: OntologyEdit, revision_id: str | None = None, session=Depends(get_session, scope="function")):
     return service.save_ontology(session, revision(session, id, revision_id, lock=True), input)
 
 
 @router.post("/import")
-def import_rdf(id: str, input: ImportInput, revision_id: str | None = None, session=Depends(get_session)):
+def import_rdf(id: str, input: ImportInput, revision_id: str | None = None, session=Depends(get_session, scope="function")):
     return service.import_ontology(session, revision(session, id, revision_id, lock=True), input)
 
 
 @router.get("/export")
-def export(id: str, revision_id: str | None = None, session=Depends(get_session)):
+def export(id: str, revision_id: str | None = None, session=Depends(get_session, scope="function")):
     return Response(
         service.details(session, revision(session, id, revision_id))["turtle"], media_type="text/turtle"
     )
 
 
 @router.post("/impact")
-def impact(id: str, input: ImportInput, revision_id: str | None = None, session=Depends(get_session)):
+def impact(id: str, input: ImportInput, revision_id: str | None = None, session=Depends(get_session, scope="function")):
     try:
         return service.impact(session, revision(session, id, revision_id), input.turtle)
     except Exception as e:
@@ -38,13 +38,13 @@ def impact(id: str, input: ImportInput, revision_id: str | None = None, session=
 
 
 @router.put("/mapping")
-def map_rdf(id: str, input: MappingInput, revision_id: str | None = None, session=Depends(get_session)):
+def map_rdf(id: str, input: MappingInput, revision_id: str | None = None, session=Depends(get_session, scope="function")):
     return service.save_mapping(session, revision(session, id, revision_id, lock=True), input)
 
 
 @router.post("/validate-sample")
 def validate_sample(
-    id: str, input: SampleInput, revision_id: str | None = None, session=Depends(get_session)
+    id: str, input: SampleInput, revision_id: str | None = None, session=Depends(get_session, scope="function")
 ):
     ontology = service.details(session, revision(session, id, revision_id))["turtle"]
     try:
@@ -59,7 +59,7 @@ class StarterInput(SampleInput):
 
 
 @router.post("/starter")
-def starter(id: str, input: StarterInput, revision_id: str | None = None, session=Depends(get_session)):
+def starter(id: str, input: StarterInput, revision_id: str | None = None, session=Depends(get_session, scope="function")):
     from pathlib import Path
     from rdflib.namespace import XSD
 
@@ -95,5 +95,5 @@ ex:identifier a owl:DatatypeProperty; rdfs:label "Identifier"; rdfs:domain ex:Kn
 
 
 @router.post("/preview-edit")
-def preview_edit(id: str, input: OntologyEdit, revision_id: str | None = None, session=Depends(get_session)):
+def preview_edit(id: str, input: OntologyEdit, revision_id: str | None = None, session=Depends(get_session, scope="function")):
     return service.edit_preview(session, revision(session, id, revision_id), input)

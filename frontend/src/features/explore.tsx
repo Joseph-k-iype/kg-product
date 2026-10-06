@@ -46,9 +46,9 @@ export function ExplorerPage() {
       <div className="guidance">
         <h3>Explore facts, with the evidence behind them.</h3>
         <p>
-          Search the things found in your documents. Open a fact to see its
-          attributes, related facts, and exact supporting passages. Extraction
-          is fixture-backed in this local demo.
+          Explore imported records and facts supported by documents. Open a
+          record to see its attributes, relationships, and original evidence.
+          Document fact extraction remains fixture-backed in this local demo.
         </p>
       </div>
       <div className="filters">
@@ -114,11 +114,14 @@ export function ExplorerPage() {
                         <strong>{entity.label}</strong>
                         <div className="subtext">{entity.id}</div>
                       </td>
-                      <td>{entity.type.replace(/([a-z])([A-Z])/g, "$1 $2")}</td>
+                      <td>
+                        {entity.type_label ||
+                          entity.type.replace(/([a-z])([A-Z])/g, "$1 $2")}
+                      </td>
                       <td>
                         {entity.evidence.length} source excerpt
                         {entity.evidence.length === 1 ? "" : "s"}
-                        <div className="subtext">Fixture-backed extraction</div>
+                        <div className="subtext">{entity.provenance_label}</div>
                       </td>
                       <td>
                         <button onClick={() => setSelected(entity)}>
@@ -161,7 +164,9 @@ export function ExplorerPage() {
           <dl className="detail-list">
             {Object.entries(selected.attributes).map(([key, value]) => (
               <div key={key} style={{ display: "contents" }}>
-                <dt>{key.replaceAll("_", " ")}</dt>
+                <dt>
+                  {selected.attribute_labels?.[key] || key.replaceAll("_", " ")}
+                </dt>
                 <dd>{value}</dd>
               </div>
             ))}
@@ -171,7 +176,12 @@ export function ExplorerPage() {
             <div className="evidence" key={i}>
               <blockquote>{e.text}</blockquote>
               <small>
-                Characters {e.start}–{e.end}
+                {e.source_row
+                  ? `Record ${e.source_row} · `
+                  : e.source_subject
+                    ? `Subject ${e.source_subject} · `
+                    : ""}
+                Characters {e.start}–{e.end} in prepared evidence
               </small>
               <EvidenceLink id={e.document_id} />
             </div>

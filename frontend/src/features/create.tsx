@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Check, FileUp } from "lucide-react";
+import { ArrowLeft, Check, Plug } from "lucide-react";
 import { api } from "../api/client";
 import type { Product, Source } from "../api/types";
 import { useData } from "../api/client";
@@ -10,12 +10,15 @@ import {
   Field,
   useNotice,
   Status,
+  ErrorState,
 } from "../components/shared";
+import { DataFiles, SourceFields, initialSource } from "./data-intake";
+import type { ImportFile } from "./data-intake";
 const steps = [
   ["Purpose", "Define the goal and ownership"],
-  ["Documents", "Choose the evidence to use"],
+  ["Bring data", "Add files or choose a data source"],
   ["Concepts", "Choose a simple starting point"],
-  ["Readiness", "Set checks and search defaults"],
+  ["Readiness", "Understand checks and search settings"],
   ["Summary", "Review and create a draft"],
 ];
 export function CreateProduct() {
@@ -24,49 +27,71 @@ export function CreateProduct() {
     [purpose, setPurpose] = useState(""),
     [domain, setDomain] = useState("General"),
     [owner, setOwner] = useState("Maya Chen"),
-    [file, setFile] = useState<File | null>(null),
+    [files, setFiles] = useState<ImportFile[]>([]),
     [sourceId, setSource] = useState(""),
+    [newSource, setNewSource] = useState(initialSource),
+    [importSourceNow, setImportSourceNow] = useState(false),
+    [connection, setConnection] = useState<{
+      record_count: number;
+      message: string;
+      truncated?: boolean;
+    } | null>(null),
+    [connectionError, setConnectionError] = useState<string | null>(null),
+    [testing, setTesting] = useState(false),
     [template, setTemplate] = useState("general"),
     [strict, setStrict] = useState(true),
     [limit, setLimit] = useState(5);
   const { data: sources } = useData<Source[]>("/sources");
   const { busy, run } = useNotice();
   const navigate = useNavigate();
+  const chosenSource = sources?.find((s) => s.id === sourceId);
+  const liveSource =
+    sourceId === "new"
+      ? ["postgres", "api"].includes(newSource.type)
+      : !!chosenSource && ["postgres", "api"].includes(chosenSource.type);
+  const fileErrors = files.some((f) => f.loading || f.error);
+  const testSource = async () => {
+    setTesting(true);
+    setConnection(null);
+    setConnectionError(null);
+    try {
+      setConnection(
+        await api(
+          sourceId === "new" ? "/sources/test" : `/sources/${sourceId}/test`,
+          "POST",
+          sourceId === "new" ? newSource : undefined,
+        ),
+      );
+    } catch (error) {
+      setConnectionError(
+        error instanceof Error ? error.message : "Could not test this source.",
+      );
+    } finally {
+      setTesting(false);
+    }
+  };
   const create = () =>
     run("Draft created", async () => {
-      const p = await api<Product>("/products", "POST", {
-        name,
-        purpose,
-        domain,
-        owner,
-        config: { quality_gates: strict ? {} : { metadata: 0.75 }, limit },
-      });
+      const form = new FormData();
+      form.append(
+        "metadata",
+        JSON.stringify({
+          name,
+          purpose,
+          domain,
+          owner,
+          config: { quality_gates: strict ? {} : { metadata: 0.75 }, limit },
+          template,
+          existing_source_id:
+            sourceId && sourceId !== "new" ? sourceId : undefined,
+          source: sourceId === "new" ? newSource : undefined,
+          import_source_now: liveSource && importSourceNow,
+        }),
+      );
+      files.forEach((item) => form.append("files", item.file));
+      const p = await api<Product>("/onboarding", "POST", form);
       sessionStorage.setItem("currentProduct", p.id);
-      try {
-        if (template !== "empty")
-          await api("/products/" + p.id + "/ontology/starter", "POST", {
-            template,
-          });
-        if (sourceId) {
-          const source = sources?.find((s) => s.id === sourceId);
-          if (source)
-            await api<Source>("/sources", "POST", {
-              name: source.name + " scope for " + name,
-              type: source.type,
-              owner: source.owner,
-              location: source.location,
-              freshness_days: source.freshness_days,
-              product_ids: [p.id],
-            });
-        }
-        if (file) {
-          const form = new FormData();
-          form.append("file", file);
-          await api("/products/" + p.id + "/documents", "POST", form);
-        }
-      } finally {
-        navigate("/products/" + p.id);
-      }
+      navigate("/products/" + p.id);
       return p;
     });
   return (
@@ -111,6 +136,9 @@ export function CreateProduct() {
               else create();
             }}
           >
+            <div className="wizard-step-caption">
+              Step {step + 1} of {steps.length} · Setup progress
+            </div>
             <h2>{steps[step][0]}</h2>
             <p>{steps[step][1]}</p>
             {step === 0 && (
@@ -152,35 +180,84 @@ export function CreateProduct() {
             )}
             {step === 1 && (
               <>
-                <div className="upload-area">
-                  <FileUp size={25} />
+                <DataFiles items={files} setItems={setFiles} />
+                <div className="intake-source">
+                  <h3>
+                    <Plug size={18} /> Connect or register a source
+                  </h3>
                   <Field
-                    label="Add a document"
-                    hint="PDF, Word, text or Markdown · up to 20 MB · optional for now"
+                    label="Data source (optional)"
+                    hint="Read a PostgreSQL table or HTTP API, or register any other location and use exported files."
                   >
-                    <input
-                      type="file"
-                      accept=".pdf,.docx,.txt,.md"
-                      onChange={(e) => setFile(e.target.files?.[0] || null)}
-                    />
+                    <select
+                      value={sourceId}
+                      onChange={(e) => {
+                        setSource(e.target.value);
+                        setConnection(null);
+                        setConnectionError(null);
+                        setImportSourceNow(false);
+                      }}
+                    >
+                      <option value="">Add sources later</option>
+                      <option value="new">Add a new data source</option>
+                      {sources?.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.name}
+                        </option>
+                      ))}
+                    </select>
                   </Field>
+                  {sourceId === "new" && (
+                    <SourceFields
+                      value={newSource}
+                      onChange={(value) => {
+                        setNewSource(value);
+                        setConnection(null);
+                        setConnectionError(null);
+                      }}
+                    />
+                  )}
+                  {liveSource && (
+                    <>
+                      <button
+                        type="button"
+                        disabled={testing}
+                        onClick={() => void testSource()}
+                      >
+                        {testing
+                          ? "Testing…"
+                          : "Test connection and preview records"}
+                      </button>
+                      {connection && (
+                        <div className="guidance">
+                          {connection.record_count} records available.{" "}
+                          {connection.message}
+                        </div>
+                      )}
+                      {connectionError && (
+                        <ErrorState message={connectionError} />
+                      )}
+                      <label className="checkbox-row">
+                        <input
+                          type="checkbox"
+                          checked={importSourceNow}
+                          onChange={(e) => setImportSourceNow(e.target.checked)}
+                        />
+                        Import a source snapshot when creating this draft
+                      </label>
+                      <p className="intake-note">
+                        Leave this unchecked to save the source setup and import
+                        later.
+                      </p>
+                    </>
+                  )}
+                  {sourceId && !liveSource && (
+                    <p className="guidance">
+                      The location will be saved. Files can be imported now;
+                      this source does not have a live connection.
+                    </p>
+                  )}
                 </div>
-                <Field
-                  label="Existing source to register"
-                  hint="Registers the source location; external sources are not connected automatically."
-                >
-                  <select
-                    value={sourceId}
-                    onChange={(e) => setSource(e.target.value)}
-                  >
-                    <option value="">Add sources later</option>
-                    {sources?.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.name}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
               </>
             )}
             {step === 2 && (
@@ -211,33 +288,59 @@ export function CreateProduct() {
               </>
             )}
             {step === 3 && (
-              <div className="form-grid">
-                <Field label="Quality requirements">
-                  <select
-                    value={strict ? "strict" : "flexible"}
-                    onChange={(e) => setStrict(e.target.value === "strict")}
-                  >
-                    <option value="strict">All checks must pass</option>
-                    <option value="flexible">
-                      Allow incomplete product details
-                    </option>
-                  </select>
-                </Field>
-                <Field label="Search result limit">
-                  <input
-                    type="number"
-                    min={1}
-                    max={50}
-                    value={limit}
-                    onChange={(e) => setLimit(Number(e.target.value))}
-                  />
-                </Field>
-                <div className="full-span guidance">
-                  A current quality check and reviewer approval are required
-                  before publication. Documents, evidence, and business rules
-                  remain required.
+              <>
+                <div className="readiness-explainer">
+                  <h3>Quality is checked after preparation</h3>
+                  <p>
+                    This step sets preferences. It does not measure how ready
+                    your knowledge is yet.
+                  </p>
+                  <ul>
+                    <li>Prepare your files and records.</li>
+                    <li>Run quality checks and resolve findings.</li>
+                    <li>Get reviewer approval before publishing.</li>
+                  </ul>
                 </div>
-              </div>
+                <div className="form-grid">
+                  <Field label="Quality requirements">
+                    <select
+                      value={strict ? "strict" : "flexible"}
+                      onChange={(e) => setStrict(e.target.value === "strict")}
+                    >
+                      <option value="strict">
+                        Complete product details — recommended
+                      </option>
+                      <option value="flexible">
+                        Allow one missing product detail
+                      </option>
+                    </select>
+                  </Field>
+                  <Field
+                    label="How many matching results?"
+                    hint="The maximum evidence matches shown for each search. Fewer results keep the list focused."
+                  >
+                    <select
+                      value={limit}
+                      onChange={(e) => setLimit(Number(e.target.value))}
+                    >
+                      <option value={3}>Show up to 3 matching results</option>
+                      <option value={5}>
+                        Show up to 5 matching results — recommended
+                      </option>
+                      <option value={10}>Show up to 10 matching results</option>
+                      <option value={20}>Show up to 20 matching results</option>
+                    </select>
+                  </Field>
+                  <p className="full-span">
+                    This is a search setting, not a readiness score.
+                  </p>
+                  <div className="full-span guidance">
+                    A current quality check and reviewer approval are required
+                    before publication. Documents, evidence, and business rules
+                    remain required.
+                  </div>
+                </div>
+              </>
             )}
             {step === 4 && (
               <>
@@ -248,8 +351,24 @@ export function CreateProduct() {
                   <dd>{purpose || "Add later"}</dd>
                   <dt>Owner</dt>
                   <dd>{owner}</dd>
-                  <dt>Documents</dt>
-                  <dd>{file?.name || "Add after creation"}</dd>
+                  <dt>Files to import</dt>
+                  <dd>
+                    {files.length
+                      ? files.map((item) => item.file.name).join(", ")
+                      : "Add after creation"}
+                  </dd>
+                  <dt>Data source</dt>
+                  <dd>
+                    {sourceId === "new"
+                      ? newSource.name
+                      : chosenSource?.name || "Add later"}
+                    {sourceId &&
+                      (liveSource && importSourceNow
+                        ? " · import snapshot now"
+                        : " · setup saved, import later")}
+                  </dd>
+                  <dt>Search results</dt>
+                  <dd>Up to {limit} evidence matches per search</dd>
                   <dt>Concept starter</dt>
                   <dd>
                     {template === "empty"
@@ -280,7 +399,10 @@ export function CreateProduct() {
                   Back
                 </button>
               )}
-              <button className="primary" disabled={busy || !name.trim()}>
+              <button
+                className="primary"
+                disabled={busy || testing || !name.trim() || fileErrors}
+              >
                 {busy ? "Creating…" : step === 4 ? "Create draft" : "Continue"}
               </button>
             </div>

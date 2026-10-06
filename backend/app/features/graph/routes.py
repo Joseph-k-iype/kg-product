@@ -9,7 +9,7 @@ router = APIRouter(prefix="/api/products/{id}")
 
 
 @router.post("/graph/build")
-def build(id: str, revision_id: str | None = None, session=Depends(get_session)):
+def build(id: str, revision_id: str | None = None, session=Depends(get_session, scope="function")):
     return service.build_graph(session, revision(session, id, revision_id, lock=True))
 
 
@@ -20,7 +20,7 @@ def entities(
     entity_type: str | None = None,
     revision_id: str | None = None,
     limit: int = Query(50, ge=1, le=200),
-    session=Depends(get_session),
+    session=Depends(get_session, scope="function"),
 ):
     rev = revision(session, id, revision_id)
     build = service.resolve_build(session, rev)
@@ -36,7 +36,7 @@ def neighbors(
     entity_id: str,
     revision_id: str | None = None,
     limit: int = Query(20, ge=1, le=50),
-    session=Depends(get_session),
+    session=Depends(get_session, scope="function"),
 ):
     build = service.resolve_build(session, revision(session, id, revision_id))
     return service.adapter.neighbors(build, entity_id, limit)
@@ -48,7 +48,7 @@ class FlagInput(BaseModel):
 
 @router.post("/entities/{entity_id}/flags", status_code=201)
 def flag(
-    id: str, entity_id: str, input: FlagInput, revision_id: str | None = None, session=Depends(get_session)
+    id: str, entity_id: str, input: FlagInput, revision_id: str | None = None, session=Depends(get_session, scope="function")
 ):
     rev = revision(session, id, revision_id)
     build = service.resolve_build(session, rev)

@@ -30,7 +30,7 @@ The first model download needs network access. `make model` downloads the pinned
 ## Business workflow
 
 1. Create a product in the five-step guided flow. An incomplete draft is allowed.
-2. Upload a PDF, Word, text, or Markdown document, or run an explicitly labeled fixture synchronization.
+2. Preview and import CSV, JSON records, Turtle, PDF, Word, text, or Markdown files. You can mix formats or configure a PostgreSQL/API source during onboarding.
 3. Choose a concept starter or use business forms to describe concepts, attributes, relationships, and rules.
 4. Run preparation. The worker records attempts, errors, and safe retries.
 5. Run quality checks and resolve findings. Each of seven dimensions has its own measured value and threshold.
@@ -38,7 +38,7 @@ The first model download needs network access. `make model` downloads the pinned
 7. Publish the approved revision. The prior release remains active if artifact preparation fails.
 8. Search a published release or a labeled draft preview; open the source evidence. Register applications that follow the active release or pin a specific release.
 
-The seed includes HR Policies, Payments, Customer Complaints, and Application Estate in different readiness states. Original documents and local-model vectors are real stored artifacts. Fact extraction is intentionally fixture-backed; each fact exposes its extraction version and source excerpts. Consumer usage is simulated and labeled. Identities are synthetic, and production authentication/authorization is not implemented.
+The seed includes HR Policies, Payments, Customer Complaints, and Application Estate in different readiness states. Original documents and local-model vectors are real stored artifacts. Structured records and Turtle relationships are imported directly with source evidence. Document fact extraction is intentionally fixture-backed; each fact exposes its processing version and source excerpts. Consumer usage is simulated and labeled. Identities are synthetic, and production authentication/authorization is not implemented.
 
 ## Container runtime
 
@@ -78,3 +78,13 @@ PostgreSQL owns products, revisions, jobs, evaluations, decisions, consumer asso
 A release prepares and verifies immutable artifacts before activating a manifest in one PostgreSQL transaction. Queries resolve that manifest's exact evidence snapshot and graph build. A published version is read-only; a new draft copies its document/chunk snapshot and requires current preparation, checks, and review.
 
 [Adapter contracts](docs/adapters.md) and [troubleshooting](docs/troubleshooting.md) describe implementation seams and failure recovery. The [approved specification](docs/superpowers/specs/2026-10-06-knowledge-product-manager-design.md) and [implementation plan](docs/superpowers/plans/2026-10-06-knowledge-product-manager.md) record the scope. WeKnora's document-first onboarding, processing timeline, cited search, and modularity informed the experience; no WeKnora source code was copied. See [WeKnora](https://github.com/Tencent/WeKnora).
+
+## Bring business data into a product
+
+Onboarding now has a **Bring data** step. Mix documents, CSV or JSON records, and Turtle files in one draft. Files are previewed before creation: CSV/JSON shows fields and sample records; Turtle reports concepts, relationships, and whether it contains only definitions. Invalid imports can be removed without losing setup. Up to 20 files, 20 MB each, and 100 MB total are accepted per draft. Structured text must be UTF-8; CSV/JSON records are bounded to 10,000 records and 100 fields. Turtle uses the supported RDF/SHACL vocabulary and is bounded to 2 MB/50,000 statements.
+
+The **Readiness** step sets preferences; it does not evaluate the product yet. “How many matching results?” controls the maximum evidence matches per search. The options explain their count, and actual quality checks run after preparation. Creation commits the product, associated source, and imports together. A validation/source failure does not leave a partially created product.
+
+**PostgreSQL and HTTP API connections** can read actual data. Configure server connection references as described in [source setup](docs/source-connections.md), choose a table or endpoint, test/preview, then import a read-only snapshot. Other systems can be registered by location and brought in through file exports. An API origin must be explicitly approved; credentials stay in server environment/.env configuration and are not returned in source metadata.
+
+Refreshing a source supersedes its previous snapshot only in the editable draft. Originals and earlier published releases remain intact. Superseded snapshots are excluded from preparation, draft facts, embeddings/search, quality checks, and subsequent releases. Identical snapshots are reused. These are manual snapshot imports; there is no background schedule or automatic API pagination.

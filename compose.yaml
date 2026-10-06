@@ -32,6 +32,9 @@ services:
       retries: 30
   api:
     build: ./backend
+    env_file:
+      - path: .env
+        required: false
     environment: &app-env
       DATABASE_URL: postgresql+psycopg://knowledge:knowledge-local@postgres:5432/knowledge
       MINIO_ENDPOINT: minio:9000

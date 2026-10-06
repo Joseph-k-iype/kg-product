@@ -12,6 +12,8 @@ app.add_middleware(
     CORSMiddleware, allow_origins=settings.cors_origins, allow_methods=["*"], allow_headers=["*"]
 )
 app.include_router(router)
+from app.features.products.onboarding import router as onboarding_router
+app.include_router(onboarding_router)
 from app.features.documents.routes import router as documents_router
 from app.features.sources.routes import router as sources_router
 

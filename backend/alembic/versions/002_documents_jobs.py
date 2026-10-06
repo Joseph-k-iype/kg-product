@@ -9,7 +9,7 @@ down_revision = "001"
 
 def upgrade():
     for model in [Source, Document, Chunk, Job]:
-        if model is Document:
+        if model in (Document, Source):
             from sqlalchemy import MetaData
 
             table = model.__table__.to_metadata(MetaData())
@@ -18,7 +18,13 @@ def upgrade():
 
             for parent in [Product, Revision, Source]:
                 parent.__table__.to_metadata(table.metadata)
-            table._columns.remove(table.c.prepare_requested)
+            later_columns = (
+                ("prepare_requested", "data_kind", "structured_data", "active")
+                if model is Document
+                else ("config",)
+            )
+            for name in later_columns:
+                table._columns.remove(table.c[name])
             table.create(op.get_bind(), checkfirst=True)
         else:
             model.__table__.create(op.get_bind(), checkfirst=True)

@@ -10,6 +10,10 @@ from app.adapters.storage import ObjectStore
 MIME_TYPES = {
     ".txt": "text/plain",
     ".md": "text/plain",
+    ".csv": "text/csv",
+    ".json": "application/json",
+    ".ttl": "text/turtle",
+    ".turtle": "text/turtle",
     ".pdf": "application/pdf",
     ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 }
@@ -35,15 +39,25 @@ def enqueue_stage(session, rev, document, stage):
     return job
 
 
-def upload_document(session, product_id, name, data, content_type, revision_id=None, source_id=None):
+def upload_document(
+    session, product_id, name, data, content_type, revision_id=None, source_id=None, normalized_data=None
+):
     if not data:
         raise HTTPException(422, {"code": "empty_file", "message": "Choose a file with content."})
     if len(data) > 20 * 1024 * 1024:
         raise HTTPException(
             413, {"code": "file_too_large", "message": "Choose a document smaller than 20 MB."}
         )
-    if Path(name).suffix.lower() not in (".txt", ".pdf", ".docx", ".md"):
-        raise HTTPException(422, {"code": "unsupported_file", "message": "Use a text, PDF or Word document."})
+    from app.adapters.structured import preview, parse
+
+    try:
+        if normalized_data is None:
+            preview(name, data)
+            structured = parse(name, data)
+        else:
+            structured = normalized_data
+    except ValueError as error:
+        raise HTTPException(422, {"code": "invalid_import", "message": str(error)})
     content_type = MIME_TYPES[Path(name).suffix.lower()]
     rev = revision(session, product_id, revision_id, lock=True)
     if source_id:
@@ -53,12 +67,21 @@ def upload_document(session, product_id, name, data, content_type, revision_id=N
         if product_id not in source.product_ids:
             raise HTTPException(422, "Source is not associated with this product")
     touch(session, rev, "Document added")
+    if structured["kind"] == "turtle":
+        from app.features.products.models import uid
+        structured = {**structured, "blank_scope": uid()}
+    if structured.get("definitions"):
+        from app.features.documents.imports import prepare_definitions
+
+        prepare_definitions(session, rev, structured)
     artifact = ObjectStore().put(data, content_type)
     doc = Document(
         product_id=product_id,
         revision_id=rev.id,
         source_id=source_id,
         name=Path(name).name,
+        data_kind=structured["kind"],
+        structured_data=structured if structured["kind"] != "document" else {},
         content_type=content_type,
         object_key=artifact.key,
         sha256=artifact.sha256,
@@ -66,7 +89,15 @@ def upload_document(session, product_id, name, data, content_type, revision_id=N
     )
     session.add(doc)
     session.flush()
-    enqueue_stage(session, rev, doc, "extracted")
+    if doc.data_kind == "definitions":
+        doc.extracted_text = structured["definitions"]
+        extracted = ObjectStore().put(doc.extracted_text.encode(), "text/plain")
+        doc.extracted_key, doc.extracted_sha256 = extracted.key, extracted.sha256
+        doc.state = "definitions_ready"
+    else:
+        if doc.data_kind != "document":
+            doc.processing_version = "structured-v1/record-v1"
+        enqueue_stage(session, rev, doc, "extracted")
     return document_detail(session, doc)
 
 
@@ -76,6 +107,9 @@ def document_detail(session, doc):
     return {
         "id": doc.id,
         "name": doc.name,
+        "data_kind": doc.data_kind,
+        "active": doc.active,
+        "record_count": len(doc.structured_data.get("records", [])),
         "product_id": doc.product_id,
         "revision_id": doc.revision_id,
         "source_id": doc.source_id,

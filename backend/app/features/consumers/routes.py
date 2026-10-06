@@ -18,7 +18,7 @@ class ConsumerInput(BaseModel):
 
 
 @router.get("")
-def list_consumers(product_id: str | None = None, session=Depends(get_session)):
+def list_consumers(product_id: str | None = None, session=Depends(get_session, scope="function")):
     query = select(Consumer).order_by(Consumer.name)
     if product_id:
         query = query.where(Consumer.product_id == product_id)
@@ -26,15 +26,15 @@ def list_consumers(product_id: str | None = None, session=Depends(get_session)):
 
 
 @router.post("", status_code=201)
-def create(input: ConsumerInput, session=Depends(get_session)):
+def create(input: ConsumerInput, session=Depends(get_session, scope="function")):
     return service.save_consumer(session, input)
 
 
 @router.patch("/{id}")
-def update(id: str, input: ConsumerInput, session=Depends(get_session)):
+def update(id: str, input: ConsumerInput, session=Depends(get_session, scope="function")):
     return service.save_consumer(session, input, id)
 
 
 @router.get("/{id}/resolve")
-def resolve(id: str, session=Depends(get_session)):
+def resolve(id: str, session=Depends(get_session, scope="function")):
     return service.resolve_consumer(session, id)

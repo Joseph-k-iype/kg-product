@@ -34,7 +34,9 @@ def resolve_inputs(session, pid, preview, revision_id=None, release_id=None):
     if preview:
         rev = revision(session, pid, revision_id)
         chunks = session.scalars(
-            select(Chunk).where(Chunk.product_id == pid, Chunk.revision_id == rev.id)
+            select(Chunk)
+            .join(Document)
+            .where(Chunk.product_id == pid, Chunk.revision_id == rev.id, Document.active.is_(True))
         ).all()
         return rev, [c.id for c in chunks], None
     from app.features.releases.models import Release
@@ -48,7 +50,11 @@ def resolve_inputs(session, pid, preview, revision_id=None, release_id=None):
 
 
 def search_vector(session, ref, model: ModelRef, query: str, limit: int, chunk_ids=None):
-    chunks_query = select(Chunk).where(Chunk.product_id == ref.product_id, Chunk.revision_id == ref.id)
+    chunks_query = (
+        select(Chunk)
+        .join(Document)
+        .where(Chunk.product_id == ref.product_id, Chunk.revision_id == ref.id, Document.active.is_(True))
+    )
     if chunk_ids is not None:
         chunks_query = chunks_query.where(Chunk.id.in_(chunk_ids))
     chunks = session.scalars(chunks_query).all()

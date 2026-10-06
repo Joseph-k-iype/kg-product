@@ -16,6 +16,7 @@ import {
   date,
 } from "../components/shared";
 import { scoped, useProduct } from "./product";
+import { SourceFields, initialSource } from "./data-intake";
 const stages = [
   ["uploaded", "Uploaded"],
   ["extracted", "Readable text"],
@@ -25,6 +26,10 @@ const stages = [
   ["validated", "Checks run"],
 ];
 function Stages({ doc }: { doc: DocumentRecord }) {
+  if (!doc.active)
+    return <Status value="draft" label="Previous source snapshot" />;
+  if (doc.data_kind === "definitions")
+    return <Status value="ready" label="Concepts and rules imported" />;
   const stageIndex = stages.findIndex(([s]) => s === doc.state);
   return (
     <div className="stage-list">
@@ -59,17 +64,19 @@ export function DocumentsPage() {
   const { data, error, loading } = useData<DocumentRecord[]>(path, 3000);
   const [selected, setSelected] = useState<string | null>(null);
   const { busy, run } = useNotice();
-  const upload = (file: File) =>
-    run("Document uploaded", async () => {
-      const form = new FormData();
-      form.append("file", file);
-      const d = await api<DocumentRecord>(path, "POST", form);
-      setSelected(d.id);
+  const upload = (files: File[]) =>
+    run("Files imported", async () => {
+      for (const file of files) {
+        const form = new FormData();
+        form.append("file", file);
+        const d = await api<DocumentRecord>(path, "POST", form);
+        setSelected(d.id);
+      }
     });
   return (
     <>
       <Block
-        title="Documents & evidence"
+        title="Files & evidence"
         subtitle="Your original files stay connected to the facts and search results they support."
       >
         {!readonly && (
@@ -77,16 +84,17 @@ export function DocumentsPage() {
             <div className="upload-area">
               <FileUp color="var(--accent)" />
               <Field
-                label="Upload a document"
-                hint="PDF, Word, text or Markdown · up to 20 MB"
+                label="Upload files"
+                hint="CSV, JSON, Turtle, PDF, Word, text or Markdown · up to 20 MB each"
               >
                 <input
                   type="file"
+                  multiple
                   disabled={busy}
-                  accept=".pdf,.docx,.txt,.md"
+                  accept=".csv,.json,.ttl,.turtle,.pdf,.docx,.txt,.md"
                   onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) upload(file);
+                    if (e.target.files?.length)
+                      upload(Array.from(e.target.files));
                     e.target.value = "";
                   }}
                 />
@@ -102,7 +110,7 @@ export function DocumentsPage() {
             <table>
               <thead>
                 <tr>
-                  <th>Document</th>
+                  <th>File</th>
                   <th>Uploaded</th>
                   <th>Preparation</th>
                   <th>Excerpts</th>
@@ -127,6 +135,11 @@ export function DocumentsPage() {
                       </button>
                       <div className="subtext">
                         {(d.size / 1024).toFixed(1)} KB · {d.uploaded_by}
+                        {d.data_kind === "definitions"
+                          ? " · Definitions only"
+                          : d.data_kind !== "document"
+                            ? ` · ${d.record_count} imported records`
+                            : ""}
                       </div>
                     </td>
                     <td>{date(d.uploaded_at)}</td>
@@ -254,8 +267,16 @@ export function DocumentDrawer({
                 ))
               ) : (
                 <Empty
-                  title="No excerpts yet"
-                  description="Prepare the document to create evidence excerpts."
+                  title={
+                    data.data_kind === "definitions"
+                      ? "Definitions imported"
+                      : "No excerpts yet"
+                  }
+                  description={
+                    data.data_kind === "definitions"
+                      ? "This file supplies concepts and rules. Add documents or records before preparing searchable evidence."
+                      : "Prepare this file to create evidence excerpts."
+                  }
                 />
               ))}
             {view === "preparation" &&
@@ -348,9 +369,9 @@ export function ProcessingPage() {
         }
       >
         <div className="block-body guidance">
-          Preparation uses a local search model. Fact extraction is
-          fixture-backed in this demo. Every stage records its result; retries
-          keep successful work.
+          Preparation makes imported records and document passages searchable.
+          Structured records are imported directly; document fact extraction is
+          fixture-backed in this demo. Retries keep successful work.
         </div>
         {error && <ErrorState message={error} />}{" "}
         {loading ? (
@@ -498,11 +519,14 @@ export function SourcesPage() {
   const { data, error, loading } = useData<Source[]>("/sources");
   const { data: catalog } = useData<Catalog>("/products");
   const [add, setAdd] = useState(false),
-    [name, setName] = useState(""),
-    [type, setType] = useState("local"),
-    [owner, setOwner] = useState("Maya Chen"),
-    [location, setLocation] = useState(""),
-    [days, setDays] = useState(30),
+    [sourceDraft, setSourceDraft] = useState(initialSource),
+    [sourcePreview, setSourcePreview] = useState<{
+      name: string;
+      record_count: number;
+      message: string;
+      columns: string[];
+      sample_rows: Record<string, string>[];
+    } | null>(null),
     [productId, setProduct] = useState(
       sessionStorage.getItem("currentProduct") || "",
     );
@@ -511,12 +535,12 @@ export function SourcesPage() {
     <>
       <PageTitle
         eyebrow="DOCUMENTS & SOURCES"
-        title="Start with trusted documents."
-        description="Register where knowledge comes from, who owns it, and how often it needs updating."
+        title="Bring your knowledge together."
+        description="Connect a database or API, or register any other source and import its exported files."
         action={
           <button className="primary" onClick={() => setAdd((v) => !v)}>
             <Plus size={15} />
-            Register source
+            Add data source
           </button>
         }
       />
@@ -528,70 +552,28 @@ export function SourcesPage() {
               e.preventDefault();
               run("Source registered", async () => {
                 await api("/sources", "POST", {
-                  name,
-                  type,
-                  owner,
-                  location,
-                  freshness_days: days,
+                  ...sourceDraft,
                   product_ids: productId ? [productId] : [],
                 });
                 setAdd(false);
-                setName("");
+                setSourceDraft(initialSource());
               });
             }}
           >
-            <div className="form-grid">
-              <Field label="Source name">
-                <input
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </Field>
-              <Field label="Source type">
-                <select value={type} onChange={(e) => setType(e.target.value)}>
-                  <option value="local">Local documents</option>
-                  <option value="external">
-                    External source — register only
+            <SourceFields value={sourceDraft} onChange={setSourceDraft} />
+            <Field label="Associate product">
+              <select
+                value={productId}
+                onChange={(e) => setProduct(e.target.value)}
+              >
+                <option value="">Associate later</option>
+                {catalog?.items.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
                   </option>
-                  <option value="fixture">Demo fixture source</option>
-                </select>
-              </Field>
-              <Field label="Source owner">
-                <input
-                  value={owner}
-                  onChange={(e) => setOwner(e.target.value)}
-                />
-              </Field>
-              <Field label="Location">
-                <input
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Link or business system name"
-                />
-              </Field>
-              <Field label="Update target in days">
-                <input
-                  type="number"
-                  min={1}
-                  value={days}
-                  onChange={(e) => setDays(Number(e.target.value))}
-                />
-              </Field>
-              <Field label="Associate product">
-                <select
-                  value={productId}
-                  onChange={(e) => setProduct(e.target.value)}
-                >
-                  <option value="">Associate later</option>
-                  {catalog?.items.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-            </div>
+                ))}
+              </select>
+            </Field>
             <div className="form-actions">
               <button type="button" onClick={() => setAdd(false)}>
                 Cancel
@@ -604,10 +586,46 @@ export function SourcesPage() {
         </Block>
       )}
       <div className="guidance">
-        External locations are registered, not live connections. “Demo sync”
-        imports synthetic documents so you can try the workflow. Upload real
-        local documents inside a product.
+        PostgreSQL and HTTP API sources can read actual records using a
+        configured connection. Other locations are registered until a connector
+        is configured; import CSV, Turtle, JSON, or document exports inside a
+        product. “Demo sync” is available only on fixture sources and imports
+        synthetic documents.
       </div>
+      {sourcePreview && (
+        <Block
+          title={`Connection preview · ${sourcePreview.name}`}
+          subtitle={`${sourcePreview.record_count} records · ${sourcePreview.message}`}
+          action={
+            <button onClick={() => setSourcePreview(null)}>
+              Close preview
+            </button>
+          }
+        >
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  {sourcePreview.columns.map((c) => (
+                    <th key={c}>{c}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {sourcePreview.sample_rows.map((row, i) => (
+                  <tr key={i}>
+                    {sourcePreview.columns.map((c) => (
+                      <td key={c} className="text-wrap">
+                        {row[c]}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Block>
+      )}
       <Block
         title="Source register"
         subtitle="Ownership, update targets, and connection state."
@@ -649,17 +667,59 @@ export function SourcesPage() {
                         : "Not synchronized"}
                     </td>
                     <td>
-                      <button
-                        disabled={busy || !s.product_ids.length}
-                        onClick={() =>
-                          run("Demo sync queued", () =>
-                            api("/sources/" + s.id + "/sync-fixture", "POST"),
-                          )
-                        }
-                      >
-                        <RefreshCw size={13} />
-                        Demo sync
-                      </button>
+                      {s.type === "postgres" || s.type === "api" ? (
+                        <div className="source-actions">
+                          <button
+                            disabled={busy}
+                            onClick={() =>
+                              run("Connection checked", async () => {
+                                const result = await api<
+                                  Omit<
+                                    NonNullable<typeof sourcePreview>,
+                                    "name"
+                                  >
+                                >(`/sources/${s.id}/test`, "POST");
+                                setSourcePreview({ ...result, name: s.name });
+                              })
+                            }
+                          >
+                            Test connection
+                          </button>
+                          <button
+                            disabled={busy || !s.product_ids.length}
+                            onClick={() =>
+                              run("Source records imported", () =>
+                                api(`/sources/${s.id}/sync`, "POST"),
+                              )
+                            }
+                          >
+                            Import snapshot
+                          </button>
+                        </div>
+                      ) : s.type === "fixture" ? (
+                        <button
+                          disabled={busy || !s.product_ids.length}
+                          onClick={() =>
+                            run("Demo sync queued", () =>
+                              api("/sources/" + s.id + "/sync-fixture", "POST"),
+                            )
+                          }
+                        >
+                          <RefreshCw size={13} />
+                          Demo sync
+                        </button>
+                      ) : s.product_ids.length ? (
+                        <a
+                          className="button"
+                          href={`/products/${s.product_ids[0]}/sources`}
+                        >
+                          Import exported files
+                        </a>
+                      ) : (
+                        <span className="subtext">
+                          Associate a product to import files
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}

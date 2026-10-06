@@ -21,12 +21,12 @@ class RetrievalInput(BaseModel):
 
 
 @router.post("/products/{id}/retrieval")
-def retrieve(id: str, input: RetrievalInput, session=Depends(get_session)):
+def retrieve(id: str, input: RetrievalInput, session=Depends(get_session, scope="function")):
     return service.retrieve(session, id, input)
 
 
 @router.get("/products/{id}/retrieval-config")
-def config(id: str, session=Depends(get_session)):
+def config(id: str, session=Depends(get_session, scope="function")):
     rev = revision(session, id)
     return {
         "embedding_model": rev.config.get("embedding_model", asdict(service.default_model())),
@@ -40,7 +40,7 @@ class ConfigInput(BaseModel):
 
 
 @router.put("/products/{id}/retrieval-config")
-def update(id: str, input: ConfigInput, session=Depends(get_session)):
+def update(id: str, input: ConfigInput, session=Depends(get_session, scope="function")):
     rev = revision(session, id, lock=True)
     touch(session, rev, "Search settings updated", input.expected_generation)
     rev.config = {**rev.config, "limit": input.limit, "embedding_model": asdict(service.default_model())}
@@ -53,7 +53,7 @@ class CaseInput(BaseModel):
 
 
 @router.post("/products/{id}/evaluation-cases")
-def save_case(id: str, input: CaseInput, session=Depends(get_session)):
+def save_case(id: str, input: CaseInput, session=Depends(get_session, scope="function")):
     revision(session, id)
     case = EvaluationCase(product_id=id, **input.model_dump())
     session.add(case)

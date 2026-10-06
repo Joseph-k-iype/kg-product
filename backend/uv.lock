@@ -370,6 +370,7 @@ dependencies = [
     { name = "pypdf" },
     { name = "pyshacl" },
     { name = "python-docx" },
+    { name = "python-dotenv" },
     { name = "python-multipart" },
     { name = "rdflib" },
     { name = "redis" },
@@ -393,7 +394,7 @@ test = [
 [package.metadata]
 requires-dist = [
     { name = "alembic", specifier = ">=1.13,<2" },
-    { name = "fastapi", specifier = ">=0.115,<1" },
+    { name = "fastapi", specifier = ">=0.121,<1" },
     { name = "httpx", marker = "extra == 'test'", specifier = ">=0.27,<1" },
     { name = "httpx2", marker = "extra == 'test'", specifier = ">=2.13,<3" },
     { name = "minio", specifier = ">=7.2,<8" },
@@ -404,6 +405,7 @@ requires-dist = [
     { name = "pyshacl", specifier = ">=0.30,<1" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=8,<9" },
     { name = "python-docx", specifier = ">=1.1,<2" },
+    { name = "python-dotenv", specifier = ">=1,<2" },
     { name = "python-multipart", specifier = ">=0.0.20" },
     { name = "rdflib", specifier = ">=7,<8" },
     { name = "redis", specifier = ">=5,<7" },

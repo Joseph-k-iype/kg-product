@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, UploadFile, File, Response
+from fastapi import APIRouter, Depends, UploadFile, File, Response, HTTPException
 from sqlalchemy import select
 from app.db import get_session
 from app.features.products.service import require, revision
@@ -10,13 +10,24 @@ from app.domain.contracts import ArtifactRef
 router = APIRouter(prefix="/api")
 
 
+@router.post("/imports/preview")
+async def preview_import(file: UploadFile = File(...)):
+    from app.adapters.structured import preview
+
+    data = await file.read(20 * 1024 * 1024 + 1)
+    try:
+        return preview(file.filename or "data.txt", data)
+    except ValueError as error:
+        raise HTTPException(422, {"code": "invalid_import", "message": str(error)})
+
+
 @router.post("/products/{id}/documents", status_code=201)
 async def upload(
     id: str,
     file: UploadFile = File(...),
     revision_id: str | None = None,
     source_id: str | None = None,
-    session=Depends(get_session),
+    session=Depends(get_session, scope="function"),
 ):
     data = await file.read(20 * 1024 * 1024 + 1)
     return service.upload_document(
@@ -31,7 +42,7 @@ async def upload(
 
 
 @router.get("/products/{id}/documents")
-def documents(id: str, revision_id: str | None = None, session=Depends(get_session)):
+def documents(id: str, revision_id: str | None = None, session=Depends(get_session, scope="function")):
     rev = revision(session, id, revision_id)
     return [
         service.document_detail(session, d)
@@ -42,12 +53,12 @@ def documents(id: str, revision_id: str | None = None, session=Depends(get_sessi
 
 
 @router.get("/documents/{id}")
-def document(id: str, session=Depends(get_session)):
+def document(id: str, session=Depends(get_session, scope="function")):
     return service.document_detail(session, require(session, Document, id))
 
 
 @router.get("/documents/{id}/original")
-def original(id: str, session=Depends(get_session)):
+def original(id: str, session=Depends(get_session, scope="function")):
     d = require(session, Document, id)
     data = ObjectStore().get(ArtifactRef(d.object_key, d.sha256, d.sha256))
     return Response(
@@ -65,14 +76,16 @@ def original(id: str, session=Depends(get_session)):
 
 
 @router.post("/jobs/{id}/retry")
-def retry(id: str, session=Depends(get_session)):
+def retry(id: str, session=Depends(get_session, scope="function")):
     return service.retry_job(session, id)
 
 
 @router.get("/products/{id}/processing")
-def processing(id: str, revision_id: str | None = None, session=Depends(get_session)):
+def processing(id: str, revision_id: str | None = None, session=Depends(get_session, scope="function")):
     rev = revision(session, id, revision_id)
-    docs = session.scalars(select(Document).where(Document.revision_id == rev.id)).all()
+    docs = session.scalars(
+        select(Document).where(Document.revision_id == rev.id, Document.active.is_(True))
+    ).all()
     from app.features.processing.models import Job
 
     revision_jobs = session.scalars(
@@ -98,14 +111,18 @@ def processing(id: str, revision_id: str | None = None, session=Depends(get_sess
 
 
 @router.post("/products/{id}/processing/run")
-def prepare(id: str, revision_id: str | None = None, session=Depends(get_session)):
+def prepare(id: str, revision_id: str | None = None, session=Depends(get_session, scope="function")):
     from app.features.products.service import mutable
     from app.features.processing.models import Job
     from app.features.graph.service import build_graph
 
     rev = revision(session, id, revision_id, lock=True)
     mutable(rev)
-    docs = session.scalars(select(Document).where(Document.revision_id == rev.id)).all()
+    docs = session.scalars(
+        select(Document).where(
+            Document.revision_id == rev.id, Document.active.is_(True), Document.data_kind != "definitions"
+        )
+    ).all()
     if not docs:
         from fastapi import HTTPException
 
@@ -126,7 +143,11 @@ def prepare(id: str, revision_id: str | None = None, session=Depends(get_session
         queued.append(job.id)
     if all(
         c.embedding is not None
-        for c in session.scalars(select(service.Chunk).where(service.Chunk.revision_id == rev.id))
+        for c in session.scalars(
+            select(service.Chunk)
+            .join(Document)
+            .where(service.Chunk.revision_id == rev.id, Document.active.is_(True))
+        )
     ) and all(d.extracted_text for d in docs):
         queue_graph(session, rev)
     return {"state": "queued", "jobs": queued, "label": "Preparing documents and fixture-backed facts"}

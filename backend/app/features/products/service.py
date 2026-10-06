@@ -124,13 +124,15 @@ def open_draft(session, product_id):
     session.flush()
     from app.features.documents.models import Document, Chunk
 
-    docs = session.scalars(select(Document).where(Document.revision_id == latest.id)).all()
+    docs = session.scalars(select(Document).where(Document.revision_id == latest.id, Document.active.is_(True))).all()
     for old in docs:
         copy = Document(
             product_id=product.id,
             revision_id=rev.id,
             source_id=old.source_id,
             name=old.name,
+            data_kind=old.data_kind,
+            structured_data=old.structured_data,
             content_type=old.content_type,
             object_key=old.object_key,
             sha256=old.sha256,

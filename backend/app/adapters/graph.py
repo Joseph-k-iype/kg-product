@@ -65,6 +65,7 @@ class GraphAdapter:
             f'MATCH (n) WHERE (toLower(n.label) CONTAINS toLower($query) OR toLower(n.id) CONTAINS toLower($query)) AND ($type="" OR n.type=$type) RETURN n.id,n.type,n.label,n.iri,n.attributes,n.evidence ORDER BY n.label LIMIT {limit}',
             {"query": query, "type": entity_type or ""},
         )
+        metadata = {n["id"]: n for n in build.instances}
         return [
             {
                 "id": r[0],
@@ -75,7 +76,9 @@ class GraphAdapter:
                 "evidence": json.loads(r[5]),
                 "build_id": build.id,
                 "extraction_version": build.extraction_version,
-                "provenance_label": "Fixture-backed extraction",
+                "provenance_label": metadata.get(r[0], {}).get("provenance_label", "Fixture-backed extraction"),
+                "type_label": metadata.get(r[0], {}).get("type_label", r[1]),
+                "attribute_labels": metadata.get(r[0], {}).get("attribute_labels", {}),
             }
             for r in rows
         ]

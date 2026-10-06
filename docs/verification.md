@@ -18,7 +18,7 @@ The backend acceptance journey used actual 384-dimensional model vectors and sem
 
 Container image verification and final independent review results are recorded after completion below. CPU-only PyTorch is selected for Linux so a local MVP does not download CUDA libraries.
 
-Limits: this is a local single-workspace MVP with synthetic identities, fixture-backed fact extraction, registered external sources, and simulated consumer usage. Production authentication, live external connectors, unrestricted OWL reasoning, remote SPARQL, and generated LLM answers are intentionally outside scope. Browser tests add inspectable QA products to the live demo; backend tests use a separate database.
+Initial implementation limits: this local single-workspace MVP used synthetic identities, fixture-backed document fact extraction, registered external sources, and simulated consumer usage. The later import update below introduces native PostgreSQL/API readers and structured facts. Production authentication, unrestricted OWL reasoning, remote SPARQL, and generated LLM answers remain outside scope. Browser tests add inspectable QA products to the live demo; backend tests use a separate database.
 
 ## Final independent review and container validation
 
@@ -37,3 +37,17 @@ Final corrected container smoke: FastAPI returned healthy status and all three s
 After the user's Nothing/Inter/Geist/shader request, the full browser suite passed **8/8**. The production frontend build passed. New regressions verify unchanged decorative artwork under reduced motion and working dashboard/navigation when GPU access is denied. Both failed before the shader existed, then passed. The accessibility check reproduced a transient opacity/contrast failure, fixed by removing text fades; the full suite subsequently passed. Existing persisted creation, document preparation, quality checks, approvals, publication, cited retrieval, product switching, and correction scoping all still passed. Backend source was unchanged by this redesign.
 
 An independent reviewer also exercised shader pause/resume, offscreen suspension, context loss/restoration, GPU cleanup and font loading, with no Critical or Important findings. Browser captures are under `docs/screenshots/*-red.png`.
+
+## Business onboarding and structured/source imports
+
+Final backend run: **51/51 passed** in 48.49 seconds, including the real-model acceptance journey. Native PostgreSQL and API tests read a real local table and HTTP service; no external business credentials were supplied. Four independent-review findings were reproduced and fixed: current source snapshot replacement, Turtle literal/label fidelity, anonymous identifier scoping, and reuse of existing vocabulary declarations.
+
+Final browser run: **10/10 passed** in 1.1 minutes. It includes mixed CSV/Turtle/document onboarding, recoverable invalid-file errors, readiness explanations, accessibility, narrow navigation, preparation through publishing and cited retrieval, search context, published correction scope, and shader fallbacks. Manual readiness inspection at 390px confirmed no page overflow. All three live storage health probes report ready.
+
+The final Docker image rebuilt successfully with the latest transaction/import source. Container smoke confirmed all three storage probes healthy, a CSV record parsed correctly, and native source modules loaded. Host API/worker and frontend remain running for the local preview.
+
+Fresh migration chain **001–010** applied to a blank `knowledge_import_migration_check` database. Column inspection confirms source configuration, normalized document data, and active-snapshot state. The old 002 migration now excludes columns introduced later, preventing duplicate-column errors during a fresh installation.
+
+The browser journey exposed success responses preceding database commits. Two deterministic ASGI/real-database regressions reproduced both stale reads at response start and a false success on commit failure. Session dependencies now complete transactions before responses using FastAPI's [function dependency scope](https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/#early-exit-and-scope); both regressions pass. The dependency minimum was raised to the version supporting this scope. A repeated ontology read in dashboard freshness checks was also removed without changing the snapshot contents.
+
+The production frontend build and focused lint checks pass. Readiness and Bring data captures are retained in `docs/screenshots/`. The existing light/red block design and Inter/Geist remain. A free 12ui alignment kit was generated against the existing Purpose target. Font/palette replacements, invented fields, raster branding, decorative side panels, and old step wording were skipped because they conflict with the user's explicit fonts and this simpler functional journey. The target kit contains no extracted raster assets; no fidelity claim is made. New generation was unavailable because the allowance/wallet was exhausted.

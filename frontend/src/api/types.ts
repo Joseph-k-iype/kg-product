@@ -50,6 +50,8 @@ export interface Evidence {
   end: number;
   source_url: string;
   document_name?: string;
+  source_row?: number;
+  source_subject?: string;
 }
 export interface Chunk extends Evidence {
   id: string;
@@ -74,6 +76,9 @@ export interface Job {
 export interface DocumentRecord {
   id: string;
   name: string;
+  data_kind: string;
+  active: boolean;
+  record_count: number;
   product_id: string;
   revision_id: string;
   source_id: string | null;
@@ -95,6 +100,7 @@ export interface Source {
   type: string;
   owner: string;
   location: string;
+  config: Record<string, unknown>;
   freshness_days: number;
   product_ids: string[];
   connection_state: string;
@@ -220,6 +226,8 @@ export interface Entity {
   build_id: string;
   extraction_version: string;
   provenance_label: string;
+  type_label?: string;
+  attribute_labels?: Record<string, string>;
 }
 export interface Relationship {
   source: string;

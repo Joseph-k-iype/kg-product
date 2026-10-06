@@ -9,12 +9,12 @@ router = APIRouter(prefix="/api/products/{id}/releases")
 
 
 @router.post("", status_code=201)
-def publish(id: str, session=Depends(get_session)):
+def publish(id: str, session=Depends(get_session, scope="function")):
     return service.activate_release(session, revision(session, id, lock=True))
 
 
 @router.get("")
-def releases(id: str, session=Depends(get_session)):
+def releases(id: str, session=Depends(get_session, scope="function")):
     return [
         service.release_detail(r)
         for r in session.scalars(
@@ -24,7 +24,7 @@ def releases(id: str, session=Depends(get_session)):
 
 
 @router.get("/{release_id}")
-def get(id: str, release_id: str, session=Depends(get_session)):
+def get(id: str, release_id: str, session=Depends(get_session, scope="function")):
     release = require(session, Release, release_id)
     if release.product_id != id:
         raise HTTPException(404, "Release not found for this product")

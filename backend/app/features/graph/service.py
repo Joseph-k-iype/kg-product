@@ -43,13 +43,32 @@ def build_graph(session, rev):
         for p in mapping.definition["properties"]
     ):
         raise HTTPException(409, "Representation settings are stale")
-    chunks = session.scalars(select(Chunk).where(Chunk.revision_id == rev.id).order_by(Chunk.id)).all()
-    docs = session.scalars(select(Document).where(Document.revision_id == rev.id)).all()
+    chunks = session.scalars(
+        select(Chunk)
+        .join(Document)
+        .where(Chunk.revision_id == rev.id, Document.active.is_(True))
+        .order_by(Chunk.id)
+    ).all()
+    docs = session.scalars(
+        select(Document).where(
+            Document.revision_id == rev.id, Document.active.is_(True), Document.data_kind != "definitions"
+        )
+    ).all()
+    extraction_version = (
+        "structured-v1/fixture-rules-v1"
+        if any(d.data_kind != "document" for d in docs)
+        else "fixture-rules-v1"
+    )
     if not chunks or any(not d.extracted_text for d in docs):
         raise HTTPException(409, "Prepare all document excerpts first")
     fingerprint = sha256(
         json.dumps(
-            {"ontology": rev.ontology_id, "mapping": rev.mapping_id, "chunks": [c.id for c in chunks]},
+            {
+                "ontology": rev.ontology_id,
+                "mapping": rev.mapping_id,
+                "chunks": [c.id for c in chunks],
+                "extraction": extraction_version,
+            },
             sort_keys=True,
         ).encode()
     ).hexdigest()
@@ -62,6 +81,18 @@ def build_graph(session, rev):
         return build_detail(existing)
     nodes = {}
     edges = []
+    documents = {d.id: d for d in docs}
+    property_keys = {p["iri"]: p["key"] for p in mapping.definition["properties"]}
+    property_labels = {p["iri"]: p["label"] for p in ontology["properties"]}
+    class_labels = {c["iri"]: c["label"] for c in ontology["classes"]}
+    scoped_ids = {}
+    for doc in docs:
+        if doc.data_kind == "turtle":
+            scope = doc.structured_data.get("blank_scope", doc.id)
+            scoped_ids[doc.id] = {
+                r["id"]: "blank-" + scope + "-" + r["id"] if r.get("blank_node") else r["id"]
+                for r in doc.structured_data["records"]
+            }
     types = {iri.rsplit("/", 1)[-1]: (iri, label) for iri, label in classes.items()}
     for chunk in chunks:
         evidence = {
@@ -73,6 +104,76 @@ def build_graph(session, rev):
             "source_url": f"/api/documents/{chunk.document_id}/original",
             "processing_version": chunk.processing_version,
         }
+        doc = documents[chunk.document_id]
+        if doc.data_kind in ("csv", "json", "turtle"):
+            record = doc.structured_data["records"][chunk.ordinal]
+            for field in ("source_row", "source_subject"):
+                if field in record:
+                    evidence[field] = record[field]
+            dataset = sha256(
+                ((doc.source_id or "local/" + doc.name) + "/" + doc.sha256).encode()
+            ).hexdigest()[:20]
+            record_id = (
+                scoped_ids[doc.id][record["id"]]
+                if doc.data_kind == "turtle"
+                else "row-" + dataset + "-" + record["id"]
+            )
+            record_iri = (
+                ("urn:knowledge:" + record_id)
+                if record.get("blank_node")
+                else record.get("iri", "urn:knowledge:" + record_id)
+            )
+            class_iri = record["class_iris"][0]
+            if class_iri not in classes:
+                raise HTTPException(409, "Map the imported record concept before preparing knowledge.")
+            terms = {property_keys[iri]: values for iri, values in record["values"].items()}
+            node = nodes.setdefault(
+                record_id,
+                {
+                    "id": record_id,
+                    "iri": record_iri,
+                    "type": classes[class_iri],
+                    "class_iri": class_iri,
+                    "class_iris": record["class_iris"],
+                    "type_label": class_labels[class_iri],
+                    "label": record["label"],
+                    "attributes": {},
+                    "attribute_terms": {},
+                    "attribute_labels": {
+                        property_keys[iri]: property_labels[iri] for iri in record["values"]
+                    },
+                    "evidence": [],
+                    "provenance_label": {
+                        "csv": "Imported CSV record",
+                        "json": "Imported JSON record",
+                        "turtle": "Imported Turtle record",
+                    }[doc.data_kind],
+                },
+            )
+            node["class_iris"] = sorted(set(node["class_iris"]) | set(record["class_iris"]))
+            for property_key, values in terms.items():
+                existing_terms = node["attribute_terms"].setdefault(property_key, [])
+                for term in values:
+                    if term not in existing_terms:
+                        existing_terms.append(term)
+                node["attributes"][property_key] = " | ".join(term["value"] for term in existing_terms)
+            node["attribute_labels"].update(
+                {property_keys[iri]: property_labels[iri] for iri in record["values"]}
+            )
+            node["evidence"].append(evidence)
+            if doc.data_kind == "turtle":
+                for edge in doc.structured_data["relationships"]:
+                    if edge["source"] == record["id"]:
+                        edges.append(
+                            {
+                                **edge,
+                                "source": scoped_ids[doc.id][edge["source"]],
+                                "target": scoped_ids[doc.id][edge["target"]],
+                                "type": property_keys[edge["iri"]],
+                                "evidence": [evidence],
+                            }
+                        )
+            continue
         matches = list(
             re.finditer(r"Complaint\s+(C-\d+)\s+submitted by\s+Customer\s+(A-\d+)", chunk.text, re.I)
         )
@@ -148,7 +249,8 @@ def build_graph(session, rev):
                 + rev.id
                 + "/"
                 + fingerprint
-                + "/fixture-rules-v1",
+                + "/"
+                + extraction_version,
             )
         )
     )
@@ -168,6 +270,7 @@ def build_graph(session, rev):
         + rev.id.replace("-", "")
         + "_"
         + id.replace("-", ""),
+        extraction_version=extraction_version,
     )
     build.instances = list(nodes.values())
     build.relationships = list(merged.values())
@@ -191,7 +294,9 @@ def build_detail(build):
         "ontology_id": build.ontology_id,
         "mapping_id": build.mapping_id,
         "extraction_version": build.extraction_version,
-        "label": "Fixture-backed extraction",
+        "label": "Structured imports and fixture-backed documents"
+        if build.extraction_version.startswith("structured")
+        else "Fixture-backed extraction",
     }
 
 

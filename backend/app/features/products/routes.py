@@ -17,33 +17,33 @@ def catalog(
     sort: str = "name",
     offset: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    session=Depends(get_session),
+    session=Depends(get_session, scope="function"),
 ):
     return service.catalog(session, q, domain, owner, state, sort, offset, limit)
 
 
 @router.post("/products", status_code=201)
-def create(input: ProductCreate, session=Depends(get_session)):
+def create(input: ProductCreate, session=Depends(get_session, scope="function")):
     return service.create_product(session, input)
 
 
 @router.get("/products/{id}")
-def get(id: str, session=Depends(get_session)):
+def get(id: str, session=Depends(get_session, scope="function")):
     return service.detail(session, service.require(session, Product, id))
 
 
 @router.patch("/products/{id}")
-def update(id: str, input: ProductUpdate, session=Depends(get_session)):
+def update(id: str, input: ProductUpdate, session=Depends(get_session, scope="function")):
     return service.update_draft(session, id, input)
 
 
 @router.post("/products/{id}/draft")
-def draft(id: str, session=Depends(get_session)):
+def draft(id: str, session=Depends(get_session, scope="function")):
     return service.open_draft(session, id)
 
 
 @router.get("/products/{id}/activity")
-def activity(id: str, session=Depends(get_session)):
+def activity(id: str, session=Depends(get_session, scope="function")):
     return session.scalars(
         select(Activity).where(Activity.product_id == id).order_by(Activity.created_at.desc())
     ).all()

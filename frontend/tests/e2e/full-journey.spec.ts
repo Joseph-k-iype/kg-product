@@ -9,7 +9,7 @@ test("create, prepare, check, approve, publish and retrieve source evidence", as
     .getByLabel("Business purpose")
     .fill("Trusted refund guidance for customer support");
   await page.getByRole("button", { name: "Continue", exact: true }).click();
-  await page.getByLabel("Add a document", { exact: true }).setInputFiles({
+  await page.getByLabel("Add files", { exact: true }).setInputFiles({
     name: "refund-guide.txt",
     mimeType: "text/plain",
     buffer: Buffer.from(
