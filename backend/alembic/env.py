@@ -6,6 +6,7 @@ from app.features.sources import models as sources
 from app.features.processing import models as processing
 from app.features.ontology import models as ontology
 from app.features.retrieval import models as retrieval
+from app.features.graph import models as graph
 with engine.connect() as connection:
     context.configure(connection=connection,target_metadata=Base.metadata)
     with context.begin_transaction():

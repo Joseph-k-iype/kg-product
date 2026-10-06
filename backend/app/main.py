@@ -36,3 +36,6 @@ app.include_router(ontology_router)
 
 from app.features.retrieval.routes import router as retrieval_router
 app.include_router(retrieval_router)
+
+from app.features.graph.routes import router as graph_router
+app.include_router(graph_router)
