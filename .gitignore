@@ -10,3 +10,5 @@ playwright-report/
 test-results/
 *.log
 .DS_Store
+*.egg-info/
+.model-cache/
