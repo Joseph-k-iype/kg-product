@@ -1,13 +1,55 @@
 # Knowledge Product Manager
 
-A local business application for creating, preparing, checking, approving, publishing, and searching governed knowledge products. The interface uses simple business language, a modern grid of flat blocks, and evidence-first workflows. Technical concepts, RDF source, and mappings live in Advanced views.
+Turn business documents and records into versioned knowledge that people and applications can trust. Create a product, bring in data, prepare it, check its quality, request approval, and publish a release. Search and AI chat show the evidence behind their answers.
+
+The interface uses plain business language, a light theme, red accents, flat grid/block layouts, Inter and Geist typography, and a decorative halftone shader with reduced-motion and GPU fallbacks. RDF, Turtle, graph mappings, and other technical details are available in advanced views.
+
+![AI chat with a cited answer and a generated fact card](docs/screenshots/ai-chat.png)
+
+## What you can do
+
+| Capability | Implemented behavior |
+|---|---|
+| Product onboarding | Five steps: purpose, data, concepts, readiness preferences, and review; incomplete drafts are allowed. |
+| Mixed imports | Preview and import CSV, JSON records, Turtle, PDF, DOCX, text, and Markdown. |
+| Source connections | Read bounded PostgreSQL table and HTTP API snapshots; register other source locations and import their exports. |
+| Concepts and rules | Guided business forms and starters backed by versioned RDF/SHACL and explicit graph mappings. |
+| Preparation | Separate worker extracts text, creates evidence chunks, embeds them, builds facts, and runs checks; attempts and retries are recorded. |
+| Quality and governance | Seven measured dimensions, current-input review evidence, separate demo reviewer, immutable published revisions. |
+| Search | Vector, graph, and hybrid retrieval scoped to a published release or an explicitly selected draft preview. |
+| AI chat | Streaming assistant-ui/Blume chat, cited originals, validated fact/table cards, DeepSeek through OpenRouter and a Claude Agent SDK/LiteLLM gateway. |
+| Connected applications | Active-release or pinned-release associations; dependency resolution and clearly labeled simulated usage. |
+| Evidence trail | Documents, concepts, mappings, builds, evaluations, reviews, and releases remain traceable. |
+
+This is a local, single-workspace MVP. Identities are synthetic; production authentication and authorization are not implemented. Unstructured document fact extraction uses deterministic demo rules, while structured records and Turtle instance data are imported directly. Read [scope and limitations](docs/limitations.md) before treating this as a production system.
+
+## Documentation
+
+| Guide | Read it for |
+|---|---|
+| [Documentation index](docs/README.md) | All guides and generated references. |
+| [Architecture](docs/architecture.md) | Components, storage responsibilities, request flows, consistency, and extension seams. |
+| [Data model](docs/data-model.md) | Domain entities, relationships, lifecycle, release manifests, and migrations. |
+| [API guide](docs/api.md) | Contracts, curl examples, errors, revision scope, streaming chat, and private gateway behavior. |
+| [OpenAPI 3.1 specification](docs/api/openapi.json) | Machine-readable public request schemas; also available at `/openapi.json` on the API. |
+| [Endpoint reference](docs/api/endpoints.md) | All 56 public operations generated from the routes. |
+| [Database dictionary](docs/reference/database.md) | Columns, types, nullable fields, keys, defaults, and unique constraints for all 16 tables. |
+| [Configuration](docs/configuration.md) | Infrastructure, model, source, and chat settings. |
+| [Operations](docs/operations.md) | Host/container startup, health, migrations, backup, recovery, and reset. |
+| [Business user guide](docs/user-guide.md) | Onboarding through publication and everyday search/chat. |
+| [Contributing](CONTRIBUTING.md) | Development workflow, checks, documentation generation, and implementation conventions. |
 
 ## Run locally
 
-Requires Docker Compose, Node.js 20+, and uv. The pinned Python runtime is 3.12. Local demo ports are bound to loopback.
+Use **Python 3.12**, **uv**, **Docker with Compose v2**, and **Node.js 22.12+** (Node 24 recommended) with npm. Node 20 is not sufficient for all current Blume dependencies. `make` is used for convenience commands. First-time installation and the embedding-model download require network access.
+
+From the repository root:
 
 ```sh
+git clone https://github.com/Joseph-k-iype/kg-product.git
+cd kg-product
 cp .env.example .env
+chmod 600 .env
 make install
 make services
 make migrate
@@ -15,86 +57,108 @@ make model
 make seed
 ```
 
-Start each long-running process in a separate terminal:
+Start each process in its own terminal, also from the repository root:
 
 ```sh
 make api
+```
+
+```sh
 make worker
+```
+
+```sh
 make dev
 ```
 
-Open [the application](http://127.0.0.1:5174/overview). The API and its interactive schema are at [localhost:58000/docs](http://127.0.0.1:58000/docs). PostgreSQL uses port 55432, MinIO 59000 (console 59001), and FalkorDB 56379. Port 5174 avoids interfering with other Vite applications.
+Open [the application](http://127.0.0.1:5174/overview). The seed skips nonempty workspaces and includes HR Policies, Payments, Customer Complaints, and Application Estate in different readiness states. Select a product, inspect its data and concepts, then prepare/check/review/publish it. Synthetic fixture documents are under `fixtures/`.
 
-The first model download needs network access. `make model` downloads the pinned all-MiniLM-L6-v2 revision. Normal preparation and retrieval use the local cache; there is no lexical-search substitution if that model is missing. The first search in a fresh API process can take longer while the model loads.
+| Service | Local address | Purpose |
+|---|---|---|
+| Frontend | `http://127.0.0.1:5174` | React/Vite application; proxies `/api` to the API. |
+| API | `http://127.0.0.1:58000` | FastAPI business and chat endpoints. |
+| Swagger UI | `http://127.0.0.1:58000/docs` | Interactive public API schema. |
+| ReDoc | `http://127.0.0.1:58000/redoc` | Readable generated API reference. |
+| PostgreSQL | `localhost:55432` | Relational metadata and pgvector evidence index. |
+| MinIO | `http://localhost:59000` | Immutable content-addressed objects. |
+| MinIO console | `http://localhost:59001` | Local artifact inspection. |
+| FalkorDB | `localhost:56379` | Redis-protocol graph service. |
 
-## Business workflow
+The example database/storage passwords are **local demo defaults**. Actual provider keys and source credentials belong only in the ignored `.env` or server process environment. The application can run without an LLM key; AI chat will report that its server connection needs configuration.
 
-1. Create a product in the five-step guided flow. An incomplete draft is allowed.
-2. Preview and import CSV, JSON records, Turtle, PDF, Word, text, or Markdown files. You can mix formats or configure a PostgreSQL/API source during onboarding.
-3. Choose a concept starter or use business forms to describe concepts, attributes, relationships, and rules.
-4. Run preparation. The worker records attempts, errors, and safe retries.
-5. Run quality checks and resolve findings. Each of seven dimensions has its own measured value and threshold.
-6. Enter a change summary and request approval. Select the synthetic Demo reviewer identity in the header to approve or request changes.
-7. Publish the approved revision. The prior release remains active if artifact preparation fails.
-8. Search a published release or a labeled draft preview; open the source evidence. Register applications that follow the active release or pin a specific release.
+## Enable AI chat
 
-The seed includes HR Policies, Payments, Customer Complaints, and Application Estate in different readiness states. Original documents and local-model vectors are real stored artifacts. Structured records and Turtle relationships are imported directly with source evidence. Document fact extraction is intentionally fixture-backed; each fact exposes its processing version and source excerpts. Consumer usage is simulated and labeled. Identities are synthetic, and production authentication/authorization is not implemented.
+Set these values in the root `.env`, then restart the API:
 
-## Container runtime
+```dotenv
+OPENROUTER_API_KEY=
+CHAT_GATEWAY_TOKEN=
+CHAT_MODEL=deepseek/deepseek-v3.2
+CHAT_GATEWAY_URL=http://127.0.0.1:58000/internal/llm
+```
 
-`make up` starts the same infrastructure plus API and worker containers. The frontend still runs with `make dev`. Do not run the host API/worker and container API/worker simultaneously. The model cache in containers is separate from the host cache; initialize it before using retrieval:
+Supply your own OpenRouter key and a random gateway token. Generate a token locally with `python3 -c 'import secrets; print(secrets.token_urlsafe(32))'`, then paste it into `.env`. Do not commit or send these values to the browser.
+
+The runtime path is **Claude Agent SDK → authenticated local Anthropic Messages gateway → LiteLLM translation → OpenRouter OpenAI-compatible Chat Completions → DeepSeek**. The SDK uses custom read-only knowledge/presentation tools. This setup does not require an Anthropic model subscription. Prepare the selected version first, then open **AI Chat** and ask a business question. The browser shows citations and validated cards; generated conclusions still need to be checked against the originals.
+
+Chat history lives in the open view. Clear, a product change, or a version change starts a new conversation. Run metadata is retained in bounded server memory rather than a durable conversation database. See [chat architecture](docs/chat-design.md) and the [library documentation review](docs/chat-ui-research.md).
+
+## Bring in your data
+
+Onboarding and Documents & Sources support mixed file imports. Up to 20 files, 20 MB each, and 100 MB total can be submitted during onboarding. CSV/JSON imports are UTF-8 and bounded to 10,000 records and 100 fields; Turtle is bounded to 2 MB and 50,000 statements. Scanned PDFs need OCR before import.
+
+To read a database or API, configure a server credential reference such as `SOURCE_SALES_DATABASE_URL` or `SOURCE_CRM_TOKEN`; source metadata stores the reference name, not its value. HTTP API origins must be explicitly approved. See [connection setup](docs/source-connections.md) for read-only accounts, record limits, records paths, timeouts, and container networking.
+
+Imports are manual snapshots. A changed source snapshot supersedes prior data only in the editable draft. Earlier published releases and immutable originals are preserved. No periodic synchronization, automatic API pagination, or native cloud/business-app reader is implemented.
+
+## Container alternative
+
+`make up` starts the three storage services plus API and worker containers. Run `make dev` separately for the frontend. Do not run host and container API/worker processes simultaneously. Migrations run at container API startup; the host and container embedding caches are separate.
+
+Initialize the container model cache after startup:
 
 ```sh
 docker compose exec api python -c "from sentence_transformers import SentenceTransformer; from app.adapters.embeddings import MODEL_NAME,MODEL_REVISION; SentenceTransformer(MODEL_NAME,revision=MODEL_REVISION,cache_folder='/models',trust_remote_code=False)"
 ```
 
-For the demo seed, run host `make seed` against the loopback services after `make install`, `make migrate`, and `make model`. The seed skips nonempty workspaces. Database migrations run automatically at container API startup. Dependency locks are supplied for both runtimes.
+The container loads the root `.env` through Compose, with internal storage URLs and chat loopback overridden by Compose. For seeding, use the host installation's `make migrate`, `make model`, and `make seed` against the same loopback services. See [operations](docs/operations.md) for the two runtime paths and recovery.
 
-## Verification
-
-```sh
-make test                 # real services + real model; creates knowledge_test
-make test-fast            # omit the actual-model journey (services still needed)
-make test-e2e             # live API/worker/frontend; creates synthetic QA products
-make build                # TypeScript and production frontend build
-```
-
-Backend tests isolate metadata in `knowledge_test`. Browser tests use the running demo workspace and leave products named `Browser product …` and `Journey …` so you can inspect their saved results. See [verification report](docs/verification.md) for executed results, scope, and limits. Synthetic text, PDF, DOCX, and ontology fixtures are under `fixtures/`.
-
-## Reset and recovery
-
-Back up local metadata before resetting:
+## Verify and build
 
 ```sh
-docker compose exec -T postgres pg_dump -U knowledge knowledge > knowledge-backup.sql
+make test         # all backend tests; real services and local embedding model required
+make test-fast    # skips tests marked model; still requires storage services
+make test-e2e     # running API/worker/frontend; installs Chromium if needed
+make build        # TypeScript check and Vite production output
+make docs         # regenerate public API and ORM reference files
+make docs-check   # fail on reference drift; no model/provider calls
 ```
 
-Stop API and worker processes, run `make reset`, then `make seed`, and restart them. Reset clears only the local application's metadata and exact FalkorDB build namespace; immutable MinIO originals remain available for recovery. It refuses other database names and does not delete infrastructure volumes. To preserve a snapshot, keep the SQL backup and the Docker volumes together; releases refer to objects and builds across all three services.
+Backend tests use a dedicated `knowledge_test` database. Browser tests use the running local workspace and retain inspectable synthetic QA products. The [verification record](docs/verification.md) records actual executed results and distinguishes runtime acceptance from provider test doubles. Browser chat tests stub the external generation seam; separate real DeepSeek calls verified the complete agent/gateway path.
 
-## Architecture
+The backend `uv.lock` and container `requirements.lock`, frontend npm lock, Blume peer-resolution `.npmrc`, and compatible routing dependency override are checked in. The generative chat bundle loads lazily. See [contributing](CONTRIBUTING.md) before changing pinned adapter dependencies.
 
-PostgreSQL owns products, revisions, jobs, evaluations, decisions, consumer associations, and activity. pgvector stores 384-dimensional excerpt vectors. MinIO stores original documents, extracted text, versioned canonical Turtle, and immutable release manifests. RDFLib and pySHACL parse, inspect, and validate supported definitions; there is no RDF triplestore or remote SPARQL endpoint. FalkorDB owns build-scoped instance graphs with explicit versioned vocabulary mappings.
+## Repository layout
 
-A release prepares and verifies immutable artifacts before activating a manifest in one PostgreSQL transaction. Queries resolve that manifest's exact evidence snapshot and graph build. A published version is read-only; a new draft copies its document/chunk snapshot and requires current preparation, checks, and review.
+```text
+backend/
+  app/adapters/             Storage, RDF/SHACL, vectors, graph, source readers
+  app/domain/               Shared artifact, revision, model, evidence contracts
+  app/features/             Product, imports, preparation, governance, search, chat
+  alembic/versions/         Migrations 001–010
+  tests/                    Unit and integration coverage
+frontend/
+  src/components/          Shared shell, business controls, shader decoration
+  src/features/            Product workflows and AI chat
+  tests/e2e/               Browser and accessibility workflows
+scripts/                   Seed, model download, test DB, reset, reference export
+fixtures/                  Synthetic document and ontology examples
+docs/                      Guides, generated contracts, screenshots, decisions
+design/                    Retained original design references
+compose.yaml               Local storage/API/worker runtime
+Makefile                   Repeatable development and documentation commands
+```
 
-[Adapter contracts](docs/adapters.md) and [troubleshooting](docs/troubleshooting.md) describe implementation seams and failure recovery. The [approved specification](docs/superpowers/specs/2026-10-06-knowledge-product-manager-design.md) and [implementation plan](docs/superpowers/plans/2026-10-06-knowledge-product-manager.md) record the scope. WeKnora's document-first onboarding, processing timeline, cited search, and modularity informed the experience; no WeKnora source code was copied. See [WeKnora](https://github.com/Tencent/WeKnora).
+PostgreSQL is the authority for workflow and release activation; MinIO holds originals, extracted text, canonical Turtle, and manifests; FalkorDB holds build-scoped facts. Read [architecture](docs/architecture.md) for why each store exists and how exact release snapshots prevent mixing versions.
 
-## Bring business data into a product
-
-Onboarding now has a **Bring data** step. Mix documents, CSV or JSON records, and Turtle files in one draft. Files are previewed before creation: CSV/JSON shows fields and sample records; Turtle reports concepts, relationships, and whether it contains only definitions. Invalid imports can be removed without losing setup. Up to 20 files, 20 MB each, and 100 MB total are accepted per draft. Structured text must be UTF-8; CSV/JSON records are bounded to 10,000 records and 100 fields. Turtle uses the supported RDF/SHACL vocabulary and is bounded to 2 MB/50,000 statements.
-
-The **Readiness** step sets preferences; it does not evaluate the product yet. “How many matching results?” controls the maximum evidence matches per search. The options explain their count, and actual quality checks run after preparation. Creation commits the product, associated source, and imports together. A validation/source failure does not leave a partially created product.
-
-**PostgreSQL and HTTP API connections** can read actual data. Configure server connection references as described in [source setup](docs/source-connections.md), choose a table or endpoint, test/preview, then import a read-only snapshot. Other systems can be registered by location and brought in through file exports. An API origin must be explicitly approved; credentials stay in server environment/.env configuration and are not returned in source metadata.
-
-Refreshing a source supersedes its previous snapshot only in the editable draft. Originals and earlier published releases remain intact. Superseded snapshots are excluded from preparation, draft facts, embeddings/search, quality checks, and subsequent releases. Identical snapshots are reused. These are manual snapshot imports; there is no background schedule or automatic API pagination.
-
-## AI chat
-
-Open **AI Chat** in the sidebar or a product. Ask questions in plain language, copy answers, expand citations, and inspect original evidence. Product/version changes clear the conversation. **Clear** also stops an in-progress answer. Chat history is local to the open view; there are no automatic conversation archives.
-
-The chat uses Blume's streaming `useAssistant` hook, assistant-ui's external store runtime and generative UI renderer, Claude Agent SDK for read-only knowledge tools, and LiteLLM to translate Anthropic Messages to OpenRouter's OpenAI-compatible Chat Completions API. The configured model is DeepSeek V3.2. A model can compose validated facts, tables and evidence views; it cannot edit or publish products or execute shell/filesystem tools.
-
-Set `OPENROUTER_API_KEY`, a random `CHAT_GATEWAY_TOKEN`, `CHAT_MODEL`, and `CHAT_GATEWAY_URL` in the ignored server `.env` (examples contain no secrets). Host gateway URL: `http://127.0.0.1:58000/internal/llm`. Compose overrides the URL to container loopback. Restart the API after configuration changes. The browser receives model availability and scoped evidence, never the provider key or local gateway token. Prepare the selected version before chatting; generated answers should be checked against their cited originals.
-
-[Chat design](docs/chat-design.md) and the [documentation review](docs/chat-ui-research.md) record the library contracts and reviewed subpages. Blume imports require the supplied Vite virtual search alias, one deduplicated React runtime, and the project `.npmrc` to avoid its Astro dependency peer-resolution loop. The chat code is loaded only on its route. Remaining npm audit notices concern unused Blume documentation/build dependencies; the high-severity routing dependency was patched through a compatible override. Chat does not render Mermaid or execute generated HTML.
+WeKnora's document-first onboarding, processing timelines, cited search, and modularity informed the experience; no WeKnora source was copied. See [Tencent/WeKnora](https://github.com/Tencent/WeKnora). Original design decisions and the approved initial specification are retained under `docs/` and `docs/superpowers/`; the current code and current guides take precedence over historical plans.

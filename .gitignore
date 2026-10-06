@@ -28,3 +28,6 @@ design/nothing-red/branch/.*
 design/nothing-red/branch/*.json
 design/nothing-red/branch/*.jsonl
 design/nothing-red/branch/prototype/
+
+# Local coordinated storage backups contain private data
+backups/
