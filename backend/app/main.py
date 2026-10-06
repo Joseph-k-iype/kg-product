@@ -33,3 +33,6 @@ def health():
 
 from app.features.ontology.routes import router as ontology_router
 app.include_router(ontology_router)
+
+from app.features.retrieval.routes import router as retrieval_router
+app.include_router(retrieval_router)
