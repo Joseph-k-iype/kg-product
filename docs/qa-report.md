@@ -60,3 +60,5 @@ The backend suite exercises real PostgreSQL/pgvector, MinIO, FalkorDB, pinned lo
 All reproduced defects listed above have fixes and regression coverage; this does not establish that every possible input or deployment is bug-free. Production identity, continuous connectors, durable/multi-process chat, OCR, unrestricted reasoning, and other documented gaps remain outside this implemented MVP.
 
 The build still reports its existing deferred-chat chunk-size advisory and upstream Zod comment annotations. Nine lower-severity dependency audit notices remain in documentation/build dependencies; there are no high-severity findings in the checked installation. A fresh migration emits a harmless SQLAlchemy duplicate-metadata-copy warning while creating all tables/indexes correctly. These advisories are recorded rather than suppressed or addressed through unrelated breaking upgrades.
+
+After publication, GitHub itself rendered all three architecture diagrams and the data-model diagram. Their actual Mermaid SVG contents were inspected in the embedded viewer, including the corrected sequence labels and all relational-map entities. No syntax-error view appeared.
