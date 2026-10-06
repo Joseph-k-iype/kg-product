@@ -14,6 +14,7 @@ import {
   ScanSearch,
   GitBranch,
   Cable,
+  MessageSquare,
 } from "lucide-react";
 import { useState } from "react";
 import type { ReactNode } from "react";
@@ -28,6 +29,7 @@ const navIcons = [
   ScanSearch,
   GitBranch,
   Cable,
+  MessageSquare,
 ];
 const destinations = [
   ["/overview", "Overview"],
@@ -40,6 +42,7 @@ const destinations = [
   ["/retrieval", "Search Playground"],
   ["/lineage", "Evidence Trail"],
   ["/consumers", "Connected Apps"],
+  ["/chat", "AI Chat"],
 ];
 export function Shell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false),

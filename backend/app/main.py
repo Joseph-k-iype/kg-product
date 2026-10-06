@@ -80,3 +80,9 @@ app.include_router(lineage_router)
 from app.features.overview.routes import router as overview_router
 
 app.include_router(overview_router)
+
+from app.features.chat.gateway import router as gateway_router
+from app.features.chat.routes import router as chat_router
+
+app.include_router(chat_router)
+app.include_router(gateway_router)

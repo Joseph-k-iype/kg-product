@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  lazy,
+  Suspense,
+} from "react";
 import { Link, NavLink, useParams, useNavigate } from "react-router-dom";
 import { Archive, FileText, Boxes, ShieldCheck, Send } from "lucide-react";
 import type { Product, Revision, OverviewData, Catalog } from "../api/types";
@@ -19,6 +26,9 @@ import { ConceptsPage } from "./concepts";
 import { ExplorerPage, LineagePage } from "./explore";
 import { HealthPage, ReviewsPage, ReleasesPage } from "./governance";
 import { RetrievalPage, ConsumersPage } from "./consume";
+const ChatPage = lazy(() =>
+  import("./chat").then((module) => ({ default: module.ChatPage })),
+);
 const ProductContext = createContext<{
   product: Product;
   revision: Revision;
@@ -50,6 +60,7 @@ const tabs = [
   ["health", "Quality Checks"],
   ["reviews", "Approvals"],
   ["retrieval", "Search"],
+  ["chat", "AI Chat"],
   ["lineage", "Evidence Trail"],
   ["consumers", "Connected Apps"],
   ["releases", "Release Activity"],
@@ -90,6 +101,11 @@ export function Workspace({
     health: <HealthPage />,
     reviews: <ReviewsPage />,
     retrieval: <RetrievalPage />,
+    chat: (
+      <Suspense fallback={<Loading />}>
+        <ChatPage />
+      </Suspense>
+    ),
     lineage: <LineagePage />,
     consumers: <ConsumersPage />,
     releases: <ReleasesPage />,
@@ -356,7 +372,7 @@ function ProductOverview() {
   );
 }
 export function ContextPage({ tab }: { tab: string }) {
-  const { data, loading, error } = useData<Catalog>("/products");
+  const { data, loading, error } = useData<Catalog>("/products?limit=200");
   const [id, setId] = useState(sessionStorage.getItem("currentProduct") || "");
   useEffect(() => {
     if (data && !data.items.some((p) => p.id === id))

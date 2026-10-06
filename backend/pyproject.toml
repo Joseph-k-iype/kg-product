@@ -2,7 +2,25 @@
 name = "knowledge-product-manager"
 version = "0.1.0"
 requires-python = ">=3.12,<3.14"
-dependencies = ["fastapi>=0.121,<1", "uvicorn>=0.30,<1", "sqlalchemy>=2.0,<3", "psycopg[binary]>=3.2,<4", "alembic>=1.13,<2", "pgvector>=0.3,<1", "pydantic-settings>=2.5,<3", "minio>=7.2,<8", "redis>=5,<7", "rdflib>=7,<8", "pyshacl>=0.30,<1", "python-multipart>=0.0.20", "python-dotenv>=1,<2", "pypdf>=5,<7", "python-docx>=1.1,<2"]
+dependencies = [
+    "fastapi>=0.121,<1",
+    "uvicorn>=0.30,<1",
+    "sqlalchemy>=2.0,<3",
+    "psycopg[binary]>=3.2,<4",
+    "alembic>=1.13,<2",
+    "pgvector>=0.3,<1",
+    "pydantic-settings>=2.5,<3",
+    "minio>=7.2,<8",
+    "redis>=5,<7",
+    "rdflib>=7,<8",
+    "pyshacl>=0.30,<1",
+    "python-multipart>=0.0.20",
+    "python-dotenv>=1,<2",
+    "pypdf>=5,<7",
+    "python-docx>=1.1,<2",
+    "claude-agent-sdk==0.2.163",
+    "litellm==1.104.0",
+]
 [project.optional-dependencies]
 test = ["pytest>=8,<9", "httpx>=0.27,<1", "httpx2>=2.13,<3", "ruff>=0.9"]
 embeddings = ["sentence-transformers>=3,<6", "torch==2.9.1"]

@@ -94,6 +94,7 @@ function App() {
               "health",
               "reviews",
               "retrieval",
+              "chat",
               "lineage",
               "consumers",
             ].map((tab) => (
