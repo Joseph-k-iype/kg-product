@@ -1,0 +1,510 @@
+{
+  "version": 1,
+  "status": "succeeded",
+  "runId": "crt-8eb216d3a7c6016c8638735b71a13f3e303b16b4",
+  "runKey": "branch:v1:img-6b224cb8a62d74efc5d00df0a58d172e:-:569cead6bd5c3597:site:branch-execute-v3",
+  "workflowRevision": "branch-execute-v3",
+  "scope": "site",
+  "concept": "Extend this knowledge app with a consistent modern flat grid/block layout and simple business language. 10 complete app views: overview; product catalog with filters and New product; five-step purpose/documents/concepts/checks/summary creation; product workspace readiness blocks with tabs; Documents & Sources with upload and evidence detail; Concepts & Rules guided class/property/rule forms with technical RDF and mappings collapsed in Advanced; Explore Knowledge evidence-first searchable facts and bounded relationship canvas; Quality Checks with seven separate checks and actionable issues; Approvals review diffs and decisions plus release activity; Search Playground with published/draft selector and ranked cited evidence; Evidence Trail with graph/table alternative; Connected Apps with follow active or pinned releases. Include all essential views, persist consistent shell from source. Business users do not understand Turtle or graphs: show concepts, facts, rules, documents and releases. Use ample space, readable grid blocks, restrained navy/blue colors, serif main titles. Label demo identities and fixture processing. Export clickable navigation baseline. Avoid charts with unexplained scores.",
+  "conceptSha256": "569cead6bd5c3597b0e04c984a4d7f51b77eb6a70cb9a545fb697e5e69a28c45",
+  "origin": "https://12ui.com",
+  "outDir": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch",
+  "attemptPath": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/branch.attempt.json",
+  "planPath": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/branch.plan.json",
+  "startedAt": "2026-10-06T02:02:46.337Z",
+  "completedAt": "2026-10-06T02:19:55.916Z",
+  "screenCount": 8,
+  "succeededCount": 8,
+  "failedCount": 0,
+  "blockedCount": 0,
+  "pageCount": 9,
+  "logicalPageCount": 5,
+  "convertedPageCount": 9,
+  "winner": {
+    "path": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/screens/winner.png",
+    "sha256": "6b224cb8a62d74efc5d00df0a58d172eb4a206e9200b43e65f460fdd7c89b170",
+    "bytes": 1381987,
+    "width": 1536,
+    "height": 1024
+  },
+  "screens": [
+    {
+      "slot": "a",
+      "pageIndex": 1,
+      "pageId": "p1-knowledge-products",
+      "viewportOrdinal": 1,
+      "status": "succeeded",
+      "direction": "Knowledge Products",
+      "path": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/screens/a.png",
+      "sha256": "e0dd47607b58e8648dc5999ff7579579a26e971708d5bb3358e78026ca9a32c7",
+      "bytes": 1435781,
+      "width": 1536,
+      "height": 1024,
+      "canvasDecision": {
+        "provenance": "inherited-from-winner",
+        "sourceCanvas": {
+          "width": 1536,
+          "height": 1024
+        }
+      }
+    },
+    {
+      "slot": "b",
+      "pageIndex": 2,
+      "pageId": "p1-knowledge-products-b",
+      "viewportOrdinal": 1,
+      "generationPageIndex": 1,
+      "generationViewportOrdinal": 2,
+      "status": "succeeded",
+      "direction": "Knowledge Products (part 2)",
+      "path": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/screens/b.png",
+      "sha256": "6b898358e0d6e52f8e6b93f9c0ba5655cc9d758949efd34529254e572b72c931",
+      "bytes": 1441023,
+      "width": 1536,
+      "height": 1024,
+      "dependsOnSlot": "a",
+      "canvasDecision": {
+        "provenance": "inherited-from-winner",
+        "sourceCanvas": {
+          "width": 1536,
+          "height": 1024
+        }
+      }
+    },
+    {
+      "slot": "c",
+      "pageIndex": 3,
+      "pageId": "p2-product-knowledge-preparation",
+      "viewportOrdinal": 1,
+      "generationPageIndex": 2,
+      "status": "succeeded",
+      "direction": "Product Knowledge Preparation",
+      "path": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/screens/c.png",
+      "sha256": "3eac275dd54af2c02b7a57e430214554f279689e71abd77e5059dd5c1809ddea",
+      "bytes": 1488361,
+      "width": 1536,
+      "height": 1024,
+      "canvasDecision": {
+        "provenance": "inherited-from-winner",
+        "sourceCanvas": {
+          "width": 1536,
+          "height": 1024
+        }
+      }
+    },
+    {
+      "slot": "d",
+      "pageIndex": 4,
+      "pageId": "p2-product-knowledge-preparation-d",
+      "viewportOrdinal": 1,
+      "generationPageIndex": 2,
+      "generationViewportOrdinal": 2,
+      "status": "succeeded",
+      "direction": "Product Knowledge Preparation (part 2)",
+      "path": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/screens/d.png",
+      "sha256": "fd94dda74c55023e25ba946dddb6f3c2f09c7c3c4e6ddeb8bf736666e92854b1",
+      "bytes": 1580098,
+      "width": 1536,
+      "height": 1024,
+      "dependsOnSlot": "c",
+      "canvasDecision": {
+        "provenance": "inherited-from-winner",
+        "sourceCanvas": {
+          "width": 1536,
+          "height": 1024
+        }
+      }
+    },
+    {
+      "slot": "e",
+      "pageIndex": 5,
+      "pageId": "p3-release-readiness-and-approvals",
+      "viewportOrdinal": 1,
+      "generationPageIndex": 3,
+      "status": "succeeded",
+      "direction": "Release Readiness and Approvals",
+      "path": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/screens/e.png",
+      "sha256": "318893dd43ea172c8bbbe4e438e99dcc6e776a05005a87d2531421ff8737916e",
+      "bytes": 1457279,
+      "width": 1536,
+      "height": 1024,
+      "canvasDecision": {
+        "provenance": "inherited-from-winner",
+        "sourceCanvas": {
+          "width": 1536,
+          "height": 1024
+        }
+      }
+    },
+    {
+      "slot": "f",
+      "pageIndex": 6,
+      "pageId": "p3-release-readiness-and-approvals-f",
+      "viewportOrdinal": 1,
+      "generationPageIndex": 3,
+      "generationViewportOrdinal": 2,
+      "status": "succeeded",
+      "direction": "Release Readiness and Approvals (part 2)",
+      "path": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/screens/f.png",
+      "sha256": "ee83034b06d1a06fd2b5a7850467fcc7c06b0669ec83c7c3f743d00dbb2b2e01",
+      "bytes": 1433381,
+      "width": 1536,
+      "height": 1024,
+      "dependsOnSlot": "e",
+      "canvasDecision": {
+        "provenance": "inherited-from-winner",
+        "sourceCanvas": {
+          "width": 1536,
+          "height": 1024
+        }
+      }
+    },
+    {
+      "slot": "g",
+      "pageIndex": 7,
+      "pageId": "p4-knowledge-search-and-evidence",
+      "viewportOrdinal": 1,
+      "generationPageIndex": 4,
+      "status": "succeeded",
+      "direction": "Knowledge Search and Evidence",
+      "path": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/screens/g.png",
+      "sha256": "a7c8e956974bc07f5f203cb9763b16911778e6345c00e1c51131559f9ff03845",
+      "bytes": 1505916,
+      "width": 1536,
+      "height": 1024,
+      "canvasDecision": {
+        "provenance": "inherited-from-winner",
+        "sourceCanvas": {
+          "width": 1536,
+          "height": 1024
+        }
+      }
+    },
+    {
+      "slot": "h",
+      "pageIndex": 8,
+      "pageId": "p4-knowledge-search-and-evidence-h",
+      "viewportOrdinal": 1,
+      "generationPageIndex": 4,
+      "generationViewportOrdinal": 2,
+      "status": "succeeded",
+      "direction": "Knowledge Search and Evidence (part 2)",
+      "path": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/screens/h.png",
+      "sha256": "2c10db5ee3cf7dece615a63119c4faac9abaca1fab4d155d9619e1653d6b388e",
+      "bytes": 1473903,
+      "width": 1536,
+      "height": 1024,
+      "dependsOnSlot": "g",
+      "canvasDecision": {
+        "provenance": "inherited-from-winner",
+        "sourceCanvas": {
+          "width": 1536,
+          "height": 1024
+        }
+      }
+    }
+  ],
+  "pages": [
+    {
+      "index": 0,
+      "id": "p0-overview",
+      "kind": "source",
+      "title": "Overview",
+      "slots": [],
+      "startsFromWinner": true,
+      "conversion": {
+        "status": "succeeded",
+        "packageId": "dc6c7219-5775-45b5-9d8d-537e080138ed",
+        "idempotencyKey": "branch-package:v1:crt-8eb216d3a7c6016c8638735b71a13f3e303b16b4:0:bc6ec516e3f3a006ad16a0e69e60c232:html:standard:default",
+        "output": "html",
+        "canonicalWidth": 1536,
+        "conversionId": "e0e3183b-8fbc-4e6b-bc10-f691193c60c7",
+        "outFile": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/pages/p0-overview.html",
+        "sha256": "63f609f011edee31858116428a60a2103ba9588fefc0eaa3b5de2699647a59b5",
+        "bytes": 185839,
+        "viewports": [
+          {
+            "id": "winner",
+            "ordinal": 1,
+            "status": "succeeded",
+            "conversionId": "ee128007-3c4e-4fb0-bca7-0f54dac44aec",
+            "sha256": "6b224cb8a62d74efc5d00df0a58d172eb4a206e9200b43e65f460fdd7c89b170",
+            "bought": true
+          }
+        ]
+      }
+    },
+    {
+      "index": 1,
+      "id": "p1-knowledge-products",
+      "kind": "additional",
+      "title": "Knowledge Products",
+      "slots": [
+        "a"
+      ],
+      "startsFromWinner": false,
+      "sourcePageIndex": 1,
+      "sourcePageId": "p1-knowledge-products",
+      "sourceViewportOrdinal": 1,
+      "conversion": {
+        "status": "succeeded",
+        "packageId": "5bf1f6f3-bf79-446e-9567-206b8d842916",
+        "idempotencyKey": "branch-package:v2:crt-8eb216d3a7c6016c8638735b71a13f3e303b16b4:11aecc868d4777aa:1:d437496b94619fbb3326:html:standard:default",
+        "output": "html",
+        "canonicalWidth": 1536,
+        "conversionId": "a15c31cf-fbe7-49cb-8a95-d1a1947c59ae",
+        "outFile": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/pages/p1-knowledge-products.html",
+        "sha256": "e529234edcf88f61f0b56897a813649f1abef0541386a511ece3cc79b0e5848f",
+        "bytes": 390002,
+        "viewports": [
+          {
+            "id": "a",
+            "ordinal": 1,
+            "status": "succeeded",
+            "conversionId": "2ebc71d8-978f-49f5-b4e1-16136f85bf24",
+            "sha256": "e0dd47607b58e8648dc5999ff7579579a26e971708d5bb3358e78026ca9a32c7",
+            "bought": true
+          }
+        ]
+      }
+    },
+    {
+      "index": 2,
+      "id": "p1-knowledge-products-b",
+      "kind": "additional",
+      "title": "Knowledge Products (part 2)",
+      "slots": [
+        "b"
+      ],
+      "startsFromWinner": false,
+      "sourcePageIndex": 1,
+      "sourcePageId": "p1-knowledge-products",
+      "sourceViewportOrdinal": 2,
+      "conversion": {
+        "status": "succeeded",
+        "packageId": "3a33ee93-2eaa-46a0-8432-b1acb90c49ae",
+        "idempotencyKey": "branch-package:v2:crt-8eb216d3a7c6016c8638735b71a13f3e303b16b4:1ecaf36805da3405:1:ef42633939755ebecc46:html:standard:default",
+        "output": "html",
+        "canonicalWidth": 1536,
+        "conversionId": "05951d70-7819-4bf3-a0b7-0703d7782cec",
+        "outFile": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/pages/p1-knowledge-products-b.html",
+        "sha256": "94f7e373ddd4ff365942851a3b050fd4e756ad5abe5acfbc5952d25627feadd8",
+        "bytes": 578316,
+        "viewports": [
+          {
+            "id": "b",
+            "ordinal": 2,
+            "status": "succeeded",
+            "conversionId": "2f1632a9-2ed8-4642-9dd2-bd39a85e92b8",
+            "sha256": "6b898358e0d6e52f8e6b93f9c0ba5655cc9d758949efd34529254e572b72c931",
+            "bought": true
+          }
+        ]
+      }
+    },
+    {
+      "index": 3,
+      "id": "p2-product-knowledge-preparation",
+      "kind": "additional",
+      "title": "Product Knowledge Preparation",
+      "slots": [
+        "c"
+      ],
+      "startsFromWinner": false,
+      "sourcePageIndex": 2,
+      "sourcePageId": "p2-product-knowledge-preparation",
+      "sourceViewportOrdinal": 1,
+      "conversion": {
+        "status": "succeeded",
+        "packageId": "2607babc-a40b-498d-a909-8218c06d1cd0",
+        "idempotencyKey": "branch-package:v2:crt-8eb216d3a7c6016c8638735b71a13f3e303b16b4:8a11ec87a6f5e006:2:021bd9ffa8df8454f51b:html:standard:default",
+        "output": "html",
+        "canonicalWidth": 1536,
+        "conversionId": "e0b92050-7fc7-4dfe-b2cd-3dd3d547036e",
+        "outFile": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/pages/p2-product-knowledge-preparation.html",
+        "sha256": "ce67024dca776c326ea08c3eca26935d8ff59a999c996e36d0515a489f3790d0",
+        "bytes": 205372,
+        "viewports": [
+          {
+            "id": "c",
+            "ordinal": 1,
+            "status": "succeeded",
+            "conversionId": "bf1cb8fa-95e6-4817-a3b6-f6a7e61dda96",
+            "sha256": "3eac275dd54af2c02b7a57e430214554f279689e71abd77e5059dd5c1809ddea",
+            "bought": true
+          }
+        ]
+      }
+    },
+    {
+      "index": 4,
+      "id": "p2-product-knowledge-preparation-d",
+      "kind": "additional",
+      "title": "Product Knowledge Preparation (part 2)",
+      "slots": [
+        "d"
+      ],
+      "startsFromWinner": false,
+      "sourcePageIndex": 2,
+      "sourcePageId": "p2-product-knowledge-preparation",
+      "sourceViewportOrdinal": 2,
+      "conversion": {
+        "status": "succeeded",
+        "packageId": "118a92b3-62cf-4900-b0ca-ea2ec0993455",
+        "idempotencyKey": "branch-package:v2:crt-8eb216d3a7c6016c8638735b71a13f3e303b16b4:8949f13a37e3b672:2:3ece57b1636869a48958:html:standard:default",
+        "output": "html",
+        "canonicalWidth": 1536,
+        "conversionId": "767063e4-f887-4718-9335-51da6f8eb855",
+        "outFile": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/pages/p2-product-knowledge-preparation-d.html",
+        "sha256": "0033d37bf7ad9cf5c683d52d07e1a550fb01c750e65c4123c68255ff9bbca27e",
+        "bytes": 162756,
+        "viewports": [
+          {
+            "id": "d",
+            "ordinal": 2,
+            "status": "succeeded",
+            "conversionId": "c9eb8ef3-6e11-4ca5-97dc-13e7826ab791",
+            "sha256": "fd94dda74c55023e25ba946dddb6f3c2f09c7c3c4e6ddeb8bf736666e92854b1",
+            "bought": true
+          }
+        ]
+      }
+    },
+    {
+      "index": 5,
+      "id": "p3-release-readiness-and-approvals",
+      "kind": "additional",
+      "title": "Release Readiness and Approvals",
+      "slots": [
+        "e"
+      ],
+      "startsFromWinner": false,
+      "sourcePageIndex": 3,
+      "sourcePageId": "p3-release-readiness-and-approvals",
+      "sourceViewportOrdinal": 1,
+      "conversion": {
+        "status": "succeeded",
+        "packageId": "056dbd7c-dafd-49ef-b92c-f7fc047f2674",
+        "idempotencyKey": "branch-package:v2:crt-8eb216d3a7c6016c8638735b71a13f3e303b16b4:d83fdf1fbd461f34:3:cc9a654a8dc88acc06bd:html:standard:default",
+        "output": "html",
+        "canonicalWidth": 1536,
+        "conversionId": "c0df5e34-8730-4b4c-95c9-78c698ae27a9",
+        "outFile": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/pages/p3-release-readiness-and-approvals.html",
+        "sha256": "4995fec3480df681712daba2ecf7410e28e2e21d19660dc576e79270b427ae8c",
+        "bytes": 347255,
+        "viewports": [
+          {
+            "id": "e",
+            "ordinal": 1,
+            "status": "succeeded",
+            "conversionId": "cbf47835-6286-4ff2-9ea1-d45e9130bd41",
+            "sha256": "318893dd43ea172c8bbbe4e438e99dcc6e776a05005a87d2531421ff8737916e",
+            "bought": true
+          }
+        ]
+      }
+    },
+    {
+      "index": 6,
+      "id": "p3-release-readiness-and-approvals-f",
+      "kind": "additional",
+      "title": "Release Readiness and Approvals (part 2)",
+      "slots": [
+        "f"
+      ],
+      "startsFromWinner": false,
+      "sourcePageIndex": 3,
+      "sourcePageId": "p3-release-readiness-and-approvals",
+      "sourceViewportOrdinal": 2,
+      "conversion": {
+        "status": "succeeded",
+        "packageId": "b2032617-fe49-4edb-8e1c-41472beec98d",
+        "idempotencyKey": "branch-package:v2:crt-8eb216d3a7c6016c8638735b71a13f3e303b16b4:98889def6a3072d1:3:7e0c2110e9f391583b75:html:standard:default",
+        "output": "html",
+        "canonicalWidth": 1536,
+        "conversionId": "e9d64f6f-63ac-48f7-8f4f-65bd181b48f4",
+        "outFile": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/pages/p3-release-readiness-and-approvals-f.html",
+        "sha256": "038954d8ab72ab47c9655f8eb3655dc4038c7b748caff2b882021bb2aa52a284",
+        "bytes": 169241,
+        "viewports": [
+          {
+            "id": "f",
+            "ordinal": 2,
+            "status": "succeeded",
+            "conversionId": "801a6f5d-f039-4210-8b0e-de9f99073e2c",
+            "sha256": "ee83034b06d1a06fd2b5a7850467fcc7c06b0669ec83c7c3f743d00dbb2b2e01",
+            "bought": true
+          }
+        ]
+      }
+    },
+    {
+      "index": 7,
+      "id": "p4-knowledge-search-and-evidence",
+      "kind": "additional",
+      "title": "Knowledge Search and Evidence",
+      "slots": [
+        "g"
+      ],
+      "startsFromWinner": false,
+      "sourcePageIndex": 4,
+      "sourcePageId": "p4-knowledge-search-and-evidence",
+      "sourceViewportOrdinal": 1,
+      "conversion": {
+        "status": "succeeded",
+        "packageId": "7680284c-89e8-4324-8261-2384e13ac82c",
+        "idempotencyKey": "branch-package:v2:crt-8eb216d3a7c6016c8638735b71a13f3e303b16b4:744db168d82c0539:4:90bcd2d0d1ee3d624109:html:standard:default",
+        "output": "html",
+        "canonicalWidth": 1536,
+        "conversionId": "d053019e-002d-4037-ab9d-a3e096a00d4c",
+        "outFile": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/pages/p4-knowledge-search-and-evidence.html",
+        "sha256": "d560c1961aadb29af8e959b551622c8891ff987337adc0512c910f93846386c6",
+        "bytes": 149459,
+        "viewports": [
+          {
+            "id": "g",
+            "ordinal": 1,
+            "status": "succeeded",
+            "conversionId": "a3458e66-1686-4944-bf46-44ad7d974903",
+            "sha256": "a7c8e956974bc07f5f203cb9763b16911778e6345c00e1c51131559f9ff03845",
+            "bought": true
+          }
+        ]
+      }
+    },
+    {
+      "index": 8,
+      "id": "p4-knowledge-search-and-evidence-h",
+      "kind": "additional",
+      "title": "Knowledge Search and Evidence (part 2)",
+      "slots": [
+        "h"
+      ],
+      "startsFromWinner": false,
+      "sourcePageIndex": 4,
+      "sourcePageId": "p4-knowledge-search-and-evidence",
+      "sourceViewportOrdinal": 2,
+      "conversion": {
+        "status": "succeeded",
+        "packageId": "a38abbb9-e050-41d3-ae2a-6203c3afce00",
+        "idempotencyKey": "branch-package:v2:crt-8eb216d3a7c6016c8638735b71a13f3e303b16b4:c8b7f4767f839f74:4:77c8fa4e9dcfe58002e8:html:standard:default",
+        "output": "html",
+        "canonicalWidth": 1536,
+        "conversionId": "ee44a20a-3327-4dea-92db-7050b0f43679",
+        "outFile": "/Users/josephkiype/.codex/worktrees/knowledge-product-manager/knowledge product/design/branch/pages/p4-knowledge-search-and-evidence-h.html",
+        "sha256": "56e28b5cda265e548d36bc3dd9bb80356b4edb28b42eef72a564c214bc5dd7fe",
+        "bytes": 244743,
+        "viewports": [
+          {
+            "id": "h",
+            "ordinal": 2,
+            "status": "succeeded",
+            "conversionId": "fab12bb0-d124-4482-a34e-1906511a4814",
+            "sha256": "2c10db5ee3cf7dece615a63119c4faac9abaca1fab4d155d9619e1653d6b388e",
+            "bought": true
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+@import "./alignment-tokens.css";
+/* Adapted from retained 12ui p0-overview export: same typography, surfaces, geometry and colors. */
+:root {
+  --nav: #152d47;
+  --nav-active: #2a4059;
+  --ink: #102f50;
+  --muted: #587193;
+  --surface: #fafbfd;
+  --line: #e1e7ee;
+  --accent: #0e4e86;
+  --radius: 8px;
+  --sidebar: 212px;
+  --heading: "Libre Baskerville", Georgia, serif;
+  --body: "Inter", system-ui, sans-serif;
+}

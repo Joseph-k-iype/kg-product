@@ -1,0 +1,426 @@
+{
+  "version": 1,
+  "runId": "crt-8eb216d3a7c6016c8638735b71a13f3e303b16b4",
+  "concept": "Extend this knowledge app with a consistent modern flat grid/block layout and simple business language. 10 complete app views: overview; product catalog with filters and New product; five-step purpose/documents/concepts/checks/summary creation; product workspace readiness blocks with tabs; Documents & Sources with upload and evidence detail; Concepts & Rules guided class/property/rule forms with technical RDF and mappings collapsed in Advanced; Explore Knowledge evidence-first searchable facts and bounded relationship canvas; Quality Checks with seven separate checks and actionable issues; Approvals review diffs and decisions plus release activity; Search Playground with published/draft selector and ranked cited evidence; Evidence Trail with graph/table alternative; Connected Apps with follow active or pinned releases. Include all essential views, persist consistent shell from source. Business users do not understand Turtle or graphs: show concepts, facts, rules, documents and releases. Use ample space, readable grid blocks, restrained navy/blue colors, serif main titles. Label demo identities and fixture processing. Export clickable navigation baseline. Avoid charts with unexplained scores.",
+  "aspect": "landscape",
+  "scope": "site",
+  "sitePurpose": "Help business teams turn documents into trustworthy knowledge products that can be checked, approved, published, and traced to evidence.",
+  "statusUpdate": "I’ll extend your overview into a connected journey through product setup, document and concept management, release review, and evidence-backed search. Each area will carry the selected product forward so users can move from preparation to publication and verify the answers afterward.",
+  "approvedScreenSummary": "The approved overview shows active products, pending approvals, blocked releases, overdue sources, an actionable attention queue, product readiness, and recent publications. It includes New knowledge product and navigation to the ten knowledge-management areas, with HR Policies, Payments, Customer Complaints, and Application Estate as example products.",
+  "winnerCanvas": {
+    "width": 1536,
+    "height": 1024
+  },
+  "pages": [
+    {
+      "index": 0,
+      "id": "p0-overview",
+      "kind": "source",
+      "title": "Overview",
+      "pageType": "application",
+      "surfaceType": "web_app",
+      "purpose": "Summarize operational readiness and direct users to products needing attention.",
+      "startsFromWinner": true,
+      "slots": []
+    },
+    {
+      "index": 1,
+      "id": "p1-knowledge-products",
+      "kind": "additional",
+      "title": "Knowledge Products",
+      "pageType": "application",
+      "surfaceType": "web_app",
+      "purpose": "Find, create, and prepare a knowledge product for review.",
+      "startsFromWinner": false,
+      "slots": [
+        "a",
+        "b"
+      ]
+    },
+    {
+      "index": 2,
+      "id": "p2-product-knowledge-preparation",
+      "kind": "additional",
+      "title": "Product Knowledge Preparation",
+      "pageType": "application",
+      "surfaceType": "web_app",
+      "purpose": "Manage source evidence and define the business concepts and rules extracted from it.",
+      "startsFromWinner": false,
+      "slots": [
+        "c",
+        "d"
+      ]
+    },
+    {
+      "index": 3,
+      "id": "p3-release-readiness-and-approvals",
+      "kind": "additional",
+      "title": "Release Readiness and Approvals",
+      "pageType": "application",
+      "surfaceType": "web_app",
+      "purpose": "Resolve quality issues and make accountable release decisions.",
+      "startsFromWinner": false,
+      "slots": [
+        "e",
+        "f"
+      ]
+    },
+    {
+      "index": 4,
+      "id": "p4-knowledge-search-and-evidence",
+      "kind": "additional",
+      "title": "Knowledge Search and Evidence",
+      "pageType": "application",
+      "surfaceType": "web_app",
+      "purpose": "Test knowledge retrieval and trace each answer through facts to its source evidence.",
+      "startsFromWinner": false,
+      "slots": [
+        "g",
+        "h"
+      ]
+    }
+  ],
+  "screens": [
+    {
+      "slot": "a",
+      "pageIndex": 1,
+      "viewportOrdinal": 1,
+      "status": "pending",
+      "direction": "Knowledge Products",
+      "header": null,
+      "footer": null,
+      "pageEndsHere": false,
+      "dependsOnSlot": null,
+      "width": 1536,
+      "height": 1024,
+      "canvasDecision": {
+        "provenance": "inherited-from-winner",
+        "sourceCanvas": {
+          "width": 1536,
+          "height": 1024
+        }
+      },
+      "content": "Browse Supplier Onboarding, Travel Expenses, Service Entitlements, and Procurement Standards with owner, readiness, and release status. Filter by status or owner and open Supplier Onboarding. New product starts a five-step purpose, documents, concepts, checks, and summary sequence with saved progress."
+    },
+    {
+      "slot": "b",
+      "pageIndex": 1,
+      "viewportOrdinal": 2,
+      "status": "pending",
+      "direction": "Knowledge Products (part 2)",
+      "header": null,
+      "footer": null,
+      "pageEndsHere": true,
+      "dependsOnSlot": "a",
+      "width": 1536,
+      "height": 1024,
+      "canvasDecision": {
+        "provenance": "inherited-from-winner",
+        "sourceCanvas": {
+          "width": 1536,
+          "height": 1024
+        }
+      },
+      "content": "Continue into Supplier Onboarding with its purpose, owner, current draft, published release, and actionable readiness requirements. Provide access to documents, concepts, checks, and release activity through product tabs. Explain missing preparation and offer the next action without repeating the catalog."
+    },
+    {
+      "slot": "c",
+      "pageIndex": 2,
+      "viewportOrdinal": 1,
+      "status": "pending",
+      "direction": "Product Knowledge Preparation",
+      "header": null,
+      "footer": null,
+      "pageEndsHere": false,
+      "dependsOnSlot": null,
+      "width": 1536,
+      "height": 1024,
+      "canvasDecision": {
+        "provenance": "inherited-from-winner",
+        "sourceCanvas": {
+          "width": 1536,
+          "height": 1024
+        }
+      },
+      "content": "Manage Supplier Onboarding sources: Supplier Handbook, Due Diligence Policy, and Insurance Requirements. Support upload, replacement, freshness review, and processing status explicitly labeled as fixture processing. Inspect a handbook passage supporting the required supplier insurance fact, with source version and location."
+    },
+    {
+      "slot": "d",
+      "pageIndex": 2,
+      "viewportOrdinal": 2,
+      "status": "pending",
+      "direction": "Product Knowledge Preparation (part 2)",
+      "header": null,
+      "footer": null,
+      "pageEndsHere": true,
+      "dependsOnSlot": "c",
+      "width": 1536,
+      "height": 1024,
+      "canvasDecision": {
+        "provenance": "inherited-from-winner",
+        "sourceCanvas": {
+          "width": 1536,
+          "height": 1024
+        }
+      },
+      "content": "Carry the selected insurance evidence into Concepts & Rules. Guide users through defining Supplier, its insurance expiry property, and a rule requiring valid coverage before approval. Show business-language validation and evidence links; keep RDF representations and source mappings collapsed under Advanced."
+    },
+    {
+      "slot": "e",
+      "pageIndex": 3,
+      "viewportOrdinal": 1,
+      "status": "pending",
+      "direction": "Release Readiness and Approvals",
+      "header": null,
+      "footer": null,
+      "pageEndsHere": false,
+      "dependsOnSlot": null,
+      "width": 1536,
+      "height": 1024,
+      "canvasDecision": {
+        "provenance": "inherited-from-winner",
+        "sourceCanvas": {
+          "width": 1536,
+          "height": 1024
+        }
+      },
+      "content": "Run seven separate Supplier Onboarding checks: source freshness, processing completion, evidence coverage, required information, conflicting facts, rule validity, and broken references. Report concrete pass, warning, or failure results. Open an expired insurance issue with affected records, supporting evidence, responsible owner, and correction action."
+    },
+    {
+      "slot": "f",
+      "pageIndex": 3,
+      "viewportOrdinal": 2,
+      "status": "pending",
+      "direction": "Release Readiness and Approvals (part 2)",
+      "header": null,
+      "footer": null,
+      "pageEndsHere": true,
+      "dependsOnSlot": "e",
+      "width": 1536,
+      "height": 1024,
+      "canvasDecision": {
+        "provenance": "inherited-from-winner",
+        "sourceCanvas": {
+          "width": 1536,
+          "height": 1024
+        }
+      },
+      "content": "Review Supplier Onboarding draft changes against release 1.2, including revised insurance requirements and resolved issues. Label reviewer identities as demo users. Support approval or requested changes with reasons, show release activity, and manage whether Supplier Portal follows active releases or stays pinned to 1.2."
+    },
+    {
+      "slot": "g",
+      "pageIndex": 4,
+      "viewportOrdinal": 1,
+      "status": "pending",
+      "direction": "Knowledge Search and Evidence",
+      "header": null,
+      "footer": null,
+      "pageEndsHere": false,
+      "dependsOnSlot": null,
+      "width": 1536,
+      "height": 1024,
+      "canvasDecision": {
+        "provenance": "inherited-from-winner",
+        "sourceCanvas": {
+          "width": 1536,
+          "height": 1024
+        }
+      },
+      "content": "Search Supplier Onboarding for “What insurance must a new supplier provide?” Choose published release 1.2 or the draft and inspect ranked results with cited passages, source dates, and release context. Open a supporting fact to explore its bounded relationships or follow its evidence trail."
+    },
+    {
+      "slot": "h",
+      "pageIndex": 4,
+      "viewportOrdinal": 2,
+      "status": "pending",
+      "direction": "Knowledge Search and Evidence (part 2)",
+      "header": null,
+      "footer": null,
+      "pageEndsHere": true,
+      "dependsOnSlot": "g",
+      "width": 1536,
+      "height": 1024,
+      "canvasDecision": {
+        "provenance": "inherited-from-winner",
+        "sourceCanvas": {
+          "width": 1536,
+          "height": 1024
+        }
+      },
+      "content": "Trace the selected insurance requirement from answer to fact, rule, handbook passage, document version, and release. Offer relationship and table alternatives with clearly named connections and a bounded scope. Let users inspect the original passage and return to the preserved search query."
+    }
+  ],
+  "packagePages": [
+    {
+      "index": 0,
+      "id": "p0-overview",
+      "kind": "source",
+      "title": "Overview",
+      "pageType": "application",
+      "surfaceType": "web_app",
+      "purpose": "Summarize operational readiness and direct users to products needing attention.",
+      "startsFromWinner": true,
+      "slots": []
+    },
+    {
+      "index": 1,
+      "id": "p1-knowledge-products",
+      "kind": "additional",
+      "title": "Knowledge Products",
+      "pageType": "application",
+      "surfaceType": "web_app",
+      "purpose": "Browse Supplier Onboarding, Travel Expenses, Service Entitlements, and Procurement Standards with owner, readiness, and release status. Filter by status or owner and open Supplier Onboarding. New product starts a five-step purpose, documents, concepts, checks, and summary sequence with saved progress.",
+      "startsFromWinner": false,
+      "slots": [
+        "a"
+      ],
+      "packageLineage": {
+        "pageIndex": 1,
+        "pageId": "p1-knowledge-products",
+        "viewportOrdinal": 1,
+        "state": "screen",
+        "slot": "a"
+      }
+    },
+    {
+      "index": 1,
+      "id": "p1-knowledge-products-b",
+      "kind": "additional",
+      "title": "Knowledge Products (part 2)",
+      "pageType": "application",
+      "surfaceType": "web_app",
+      "purpose": "Continue into Supplier Onboarding with its purpose, owner, current draft, published release, and actionable readiness requirements. Provide access to documents, concepts, checks, and release activity through product tabs. Explain missing preparation and offer the next action without repeating the catalog.",
+      "startsFromWinner": false,
+      "slots": [
+        "b"
+      ],
+      "packageLineage": {
+        "pageIndex": 1,
+        "pageId": "p1-knowledge-products",
+        "viewportOrdinal": 2,
+        "state": "screen",
+        "slot": "b"
+      }
+    },
+    {
+      "index": 2,
+      "id": "p2-product-knowledge-preparation",
+      "kind": "additional",
+      "title": "Product Knowledge Preparation",
+      "pageType": "application",
+      "surfaceType": "web_app",
+      "purpose": "Manage Supplier Onboarding sources: Supplier Handbook, Due Diligence Policy, and Insurance Requirements. Support upload, replacement, freshness review, and processing status explicitly labeled as fixture processing. Inspect a handbook passage supporting the required supplier insurance fact, with source version and location.",
+      "startsFromWinner": false,
+      "slots": [
+        "c"
+      ],
+      "packageLineage": {
+        "pageIndex": 2,
+        "pageId": "p2-product-knowledge-preparation",
+        "viewportOrdinal": 1,
+        "state": "screen",
+        "slot": "c"
+      }
+    },
+    {
+      "index": 2,
+      "id": "p2-product-knowledge-preparation-d",
+      "kind": "additional",
+      "title": "Product Knowledge Preparation (part 2)",
+      "pageType": "application",
+      "surfaceType": "web_app",
+      "purpose": "Carry the selected insurance evidence into Concepts & Rules. Guide users through defining Supplier, its insurance expiry property, and a rule requiring valid coverage before approval. Show business-language validation and evidence links; keep RDF representations and source mappings collapsed under Advanced.",
+      "startsFromWinner": false,
+      "slots": [
+        "d"
+      ],
+      "packageLineage": {
+        "pageIndex": 2,
+        "pageId": "p2-product-knowledge-preparation",
+        "viewportOrdinal": 2,
+        "state": "screen",
+        "slot": "d"
+      }
+    },
+    {
+      "index": 3,
+      "id": "p3-release-readiness-and-approvals",
+      "kind": "additional",
+      "title": "Release Readiness and Approvals",
+      "pageType": "application",
+      "surfaceType": "web_app",
+      "purpose": "Run seven separate Supplier Onboarding checks: source freshness, processing completion, evidence coverage, required information, conflicting facts, rule validity, and broken references. Report concrete pass, warning, or failure results. Open an expired insurance issue with affected records, supporting evidence, responsible owner, and correction action.",
+      "startsFromWinner": false,
+      "slots": [
+        "e"
+      ],
+      "packageLineage": {
+        "pageIndex": 3,
+        "pageId": "p3-release-readiness-and-approvals",
+        "viewportOrdinal": 1,
+        "state": "screen",
+        "slot": "e"
+      }
+    },
+    {
+      "index": 3,
+      "id": "p3-release-readiness-and-approvals-f",
+      "kind": "additional",
+      "title": "Release Readiness and Approvals (part 2)",
+      "pageType": "application",
+      "surfaceType": "web_app",
+      "purpose": "Review Supplier Onboarding draft changes against release 1.2, including revised insurance requirements and resolved issues. Label reviewer identities as demo users. Support approval or requested changes with reasons, show release activity, and manage whether Supplier Portal follows active releases or stays pinned to 1.2.",
+      "startsFromWinner": false,
+      "slots": [
+        "f"
+      ],
+      "packageLineage": {
+        "pageIndex": 3,
+        "pageId": "p3-release-readiness-and-approvals",
+        "viewportOrdinal": 2,
+        "state": "screen",
+        "slot": "f"
+      }
+    },
+    {
+      "index": 4,
+      "id": "p4-knowledge-search-and-evidence",
+      "kind": "additional",
+      "title": "Knowledge Search and Evidence",
+      "pageType": "application",
+      "surfaceType": "web_app",
+      "purpose": "Search Supplier Onboarding for “What insurance must a new supplier provide?” Choose published release 1.2 or the draft and inspect ranked results with cited passages, source dates, and release context. Open a supporting fact to explore its bounded relationships or follow its evidence trail.",
+      "startsFromWinner": false,
+      "slots": [
+        "g"
+      ],
+      "packageLineage": {
+        "pageIndex": 4,
+        "pageId": "p4-knowledge-search-and-evidence",
+        "viewportOrdinal": 1,
+        "state": "screen",
+        "slot": "g"
+      }
+    },
+    {
+      "index": 4,
+      "id": "p4-knowledge-search-and-evidence-h",
+      "kind": "additional",
+      "title": "Knowledge Search and Evidence (part 2)",
+      "pageType": "application",
+      "surfaceType": "web_app",
+      "purpose": "Trace the selected insurance requirement from answer to fact, rule, handbook passage, document version, and release. Offer relationship and table alternatives with clearly named connections and a bounded scope. Let users inspect the original passage and return to the preserved search query.",
+      "startsFromWinner": false,
+      "slots": [
+        "h"
+      ],
+      "packageLineage": {
+        "pageIndex": 4,
+        "pageId": "p4-knowledge-search-and-evidence",
+        "viewportOrdinal": 2,
+        "state": "screen",
+        "slot": "h"
+      }
+    }
+  ]
+}

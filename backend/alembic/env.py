@@ -11,7 +11,8 @@ from app.features.evaluations import models as evaluations
 from app.features.reviews import models as reviews
 from app.features.releases import models as releases
 from app.features.consumers import models as consumers
+
 with engine.connect() as connection:
-    context.configure(connection=connection,target_metadata=Base.metadata)
+    context.configure(connection=connection, target_metadata=Base.metadata)
     with context.begin_transaction():
         context.run_migrations()

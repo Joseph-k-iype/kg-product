@@ -12,3 +12,10 @@ test-results/
 .DS_Store
 *.egg-info/
 .model-cache/
+
+# 12ui improve kits: candidates, captures and targets are not source
+.improve/
+.improve/
+design/targets/
+*.tsbuildinfo
+knowledge-backup.sql

@@ -1,0 +1,54 @@
+/* Proposed tokens from recurring target deltas. Review names in the owning design system. */
+
+:root {
+  /* selectors: #main>div:nth-child(1)>div>p, #main>div:nth-child(2)>div:nth-child(1)>div>div:nth-child(1), #main>div:nth-child(2)>div:nth-child(1)>div>div:nth-child(2), #main>div:nth-child(2)>div:nth-child(1)>div>small, #main>div:nth-child(2)>div:nth-child(2)>div>div:nth-child(1), #main>div:nth-child(2)>div:nth-child(2)>div>div:nth-child(2), #main>div:nth-child(2)>div:nth-child(3)>div>div:nth-child(1), #main>div:nth-child(2)>div:nth-child(3)>div>small, #main>div:nth-child(2)>div:nth-child(4)>div>div:nth-child(1), #main>div:nth-child(2)>div:nth-child(4)>div>div:nth-child(2), #main>div:nth-child(2)>div:nth-child(4)>div>small, #main>div:nth-child(4)>section:nth-child(1)>header>div>p, #main>div:nth-child(4)>section:nth-child(2)>div>div>a, #main>section>div>div:nth-child(1)>div>p, #main>section>div>div:nth-child(1)>div>strong, #main>section>div>div:nth-child(4)>div>p, #root>div>aside>nav>a:nth-child(10), #root>div>aside>nav>a:nth-child(2), #root>div>aside>nav>a:nth-child(3), #root>div>aside>nav>a:nth-child(4), #root>div>aside>nav>a:nth-child(5), #root>div>aside>nav>a:nth-child(6), #root>div>aside>nav>a:nth-child(7), #root>div>aside>nav>a:nth-child(8), #root>div>aside>nav>a:nth-child(9), .active, .eyebrow */
+  --ui-text-text-align-left: left;
+  /* selectors: #main>div:nth-child(2)>div:nth-child(1)>div>div:nth-child(1), #main>div:nth-child(2)>div:nth-child(2)>div>div:nth-child(1), #main>div:nth-child(2)>div:nth-child(3)>div>div:nth-child(1), #main>div:nth-child(2)>div:nth-child(4)>div>div:nth-child(1), #main>div:nth-child(4)>section:nth-child(2)>div>div>a, #main>section>div>div:nth-child(1)>div>p, #main>section>div>div:nth-child(1)>div>strong, #main>section>div>div:nth-child(4)>div>p, #root>div>aside>nav>a:nth-child(10), #root>div>aside>nav>a:nth-child(2), #root>div>aside>nav>a:nth-child(3), #root>div>aside>nav>a:nth-child(4), #root>div>aside>nav>a:nth-child(5), #root>div>aside>nav>a:nth-child(6), #root>div>aside>nav>a:nth-child(7), #root>div>aside>nav>a:nth-child(8), #root>div>aside>nav>a:nth-child(9), .active, .eyebrow */
+  --ui-text-font-size-12: 12px;
+  /* selectors: #main>div:nth-child(1)>div>p, #main>div:nth-child(2)>div:nth-child(1)>div>small, #main>div:nth-child(2)>div:nth-child(3)>div>small, #main>div:nth-child(2)>div:nth-child(4)>div>small, #main>div:nth-child(4)>section:nth-child(1)>div>table>thead>tr>th:nth-child(1), #main>div:nth-child(4)>section:nth-child(1)>div>table>thead>tr>th:nth-child(2), #main>div:nth-child(4)>section:nth-child(1)>div>table>thead>tr>th:nth-child(3), #main>div:nth-child(4)>section:nth-child(1)>div>table>thead>tr>th:nth-child(4), #main>div:nth-child(4)>section:nth-child(1)>header>div>p, #main>section>div>div:nth-child(4)>div>p */
+  --ui-text-color-71849e: #71849e;
+  /* selectors: #root>div>aside>nav>a:nth-child(10), #root>div>aside>nav>a:nth-child(2), #root>div>aside>nav>a:nth-child(3), #root>div>aside>nav>a:nth-child(4), #root>div>aside>nav>a:nth-child(5), #root>div>aside>nav>a:nth-child(6), #root>div>aside>nav>a:nth-child(7), #root>div>aside>nav>a:nth-child(8), #root>div>aside>nav>a:nth-child(9), .active, .eyebrow */
+  --ui-text-font-weight-500: 500;
+  /* selectors: #main>div:nth-child(2)>div:nth-child(1)>div>small, #main>div:nth-child(2)>div:nth-child(3)>div>small, #main>div:nth-child(2)>div:nth-child(4)>div>small, #main>div:nth-child(4)>section:nth-child(1)>div>table>tbody>tr:nth-child(1)>td:nth-child(1)>a>strong, #main>div:nth-child(4)>section:nth-child(1)>div>table>tbody>tr:nth-child(1)>td:nth-child(2)>span, #main>div:nth-child(4)>section:nth-child(1)>div>table>tbody>tr:nth-child(1)>td:nth-child(3), #main>div:nth-child(4)>section:nth-child(1)>div>table>tbody>tr:nth-child(1)>td:nth-child(4)>span, #main>div:nth-child(4)>section:nth-child(1)>header>div>p */
+  --ui-text-font-size-11: 11px;
+  /* selectors: #main>div:nth-child(2)>div:nth-child(1)>div>div:nth-child(1), #main>div:nth-child(2)>div:nth-child(2)>div>div:nth-child(1), #main>div:nth-child(2)>div:nth-child(3)>div>div:nth-child(1), #main>div:nth-child(2)>div:nth-child(4)>div>div:nth-child(1), #main>div:nth-child(4)>section:nth-child(2)>div>div>a, #main>section>div>div:nth-child(1)>div>p, #main>section>div>div:nth-child(1)>div>strong */
+  --ui-text-font-weight-600: 600;
+  /* selectors: #main>div:nth-child(2)>div:nth-child(1), #main>div:nth-child(2)>div:nth-child(2), #main>div:nth-child(2)>div:nth-child(3), #main>div:nth-child(2)>div:nth-child(4) */
+  --ui-card-border-1px-solid-e1e7ee: 1px solid #e1e7ee;
+  /* selectors: #main>div:nth-child(2)>div:nth-child(1), #main>div:nth-child(2)>div:nth-child(2), #main>div:nth-child(2)>div:nth-child(3), #main>div:nth-child(2)>div:nth-child(4) */
+  --ui-card-border-radius-8px: 8px;
+  /* selectors: #main>div:nth-child(2)>div:nth-child(1)>div>div:nth-child(1), #main>div:nth-child(2)>div:nth-child(2)>div>div:nth-child(1), #main>div:nth-child(2)>div:nth-child(3)>div>div:nth-child(1), #main>div:nth-child(2)>div:nth-child(4)>div>div:nth-child(1) */
+  --ui-text-color-526f91: #526f91;
+  /* selectors: #main>div:nth-child(2)>div:nth-child(1)>svg, .lucide-clock, .lucide-file-text, .lucide-triangle-alert */
+  --ui-icon-color-3a699c: #3a699c;
+  /* selectors: #main>div:nth-child(4)>section:nth-child(1)>div>table>thead>tr>th:nth-child(1), #main>div:nth-child(4)>section:nth-child(1)>div>table>thead>tr>th:nth-child(2), #main>div:nth-child(4)>section:nth-child(1)>div>table>thead>tr>th:nth-child(3), #main>div:nth-child(4)>section:nth-child(1)>div>table>thead>tr>th:nth-child(4) */
+  --ui-text-font-size-10: 10px;
+  /* selectors: #main>div:nth-child(1)>div>h1, #main>div:nth-child(4)>section:nth-child(1)>header>div>h2, #main>div:nth-child(4)>section:nth-child(2)>header>div>h2, #main>section>header>div>h2 */
+  --ui-heading-text-align-left: left;
+  /* selectors: #main>div:nth-child(2)>div:nth-child(1)>div>div:nth-child(2), #main>div:nth-child(2)>div:nth-child(2)>div>div:nth-child(2), #main>div:nth-child(2)>div:nth-child(4)>div>div:nth-child(2) */
+  --ui-text-color-122b47: #122b47;
+  /* selectors: #main>div:nth-child(4)>section:nth-child(1)>header>div>h2, #main>div:nth-child(4)>section:nth-child(2)>header>div>h2, #main>section>header>div>h2 */
+  --ui-heading-color-1b304b: #1b304b;
+  /* selectors: #main>div:nth-child(4)>section:nth-child(1)>div>table>tbody>tr:nth-child(1)>td:nth-child(1)>a>strong, #main>div:nth-child(4)>section:nth-child(1)>div>table>tbody>tr:nth-child(1)>td:nth-child(2)>span, #main>div:nth-child(4)>section:nth-child(1)>div>table>tbody>tr:nth-child(1)>td:nth-child(3), #main>div:nth-child(4)>section:nth-child(1)>div>table>tbody>tr:nth-child(1)>td:nth-child(4)>span */
+  --ui-text-color-213955: #213955;
+  /* selectors: #main>div:nth-child(2)>div:nth-child(1)>div>div:nth-child(2), #main>div:nth-child(2)>div:nth-child(2)>div>div:nth-child(2), #main>div:nth-child(2)>div:nth-child(4)>div>div:nth-child(2) */
+  --ui-text-font-size-35: 35px;
+  /* selectors: #main>div:nth-child(4)>section:nth-child(1)>header>div>h2, #main>div:nth-child(4)>section:nth-child(2)>header>div>h2, #main>section>header>div>h2 */
+  --ui-heading-font-size-15: 15px;
+  /* selectors: #main>div:nth-child(4)>section:nth-child(2)>div>span, #main>section>div>div:nth-child(2)>span:nth-child(3), #root>div>div>header>div:nth-child(2)>label>span */
+  --ui-badge-text-align-center: center;
+  /* selectors: #main>div:nth-child(4)>section:nth-child(1)>div>table>tbody>tr:nth-child(1)>td:nth-child(3)>div, #main>div:nth-child(4)>section:nth-child(2), #main>section */
+  --ui-panel-background-fbfcfe: #fbfcfe;
+  /* selectors: #main>div:nth-child(4)>section:nth-child(1)>div>table>tbody>tr:nth-child(1)>td:nth-child(3)>div, #main>div:nth-child(4)>section:nth-child(2), #main>section */
+  --ui-panel-border-1px-solid-e1e7ee: 1px solid #e1e7ee;
+  /* selectors: #main>div:nth-child(4)>section:nth-child(2)>div>span, #main>section>div>div:nth-child(2)>span:nth-child(3) */
+  --ui-badge-border-radius-12px: 12px;
+  /* selectors: #main>div:nth-child(4)>section:nth-child(1)>div>table>tbody>tr:nth-child(1)>td:nth-child(3)>div, #main>div:nth-child(4)>section:nth-child(2), #main>section */
+  --ui-panel-border-radius-8px: 8px;
+  /* selectors: #main>div:nth-child(4)>section:nth-child(2)>div>div>a, #main>section>div>div:nth-child(1)>div>p, #main>section>div>div:nth-child(1)>div>strong */
+  --ui-text-color-253950: #253950;
+  /* selectors: #main>div:nth-child(4)>section:nth-child(2)>div>span, #main>section>div>div:nth-child(2)>span:nth-child(3) */
+  --ui-badge-font-size-10: 10px;
+  /* selectors: #main>div:nth-child(4)>section:nth-child(2)>div>span, #main>section>div>div:nth-child(2)>span:nth-child(3) */
+  --ui-badge-font-weight-500: 500;
+}
