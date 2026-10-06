@@ -24,3 +24,7 @@ design/branch/branch.attempt.json
 design/branch/branch.progress.json
 design/branch/journal.jsonl
 design/branch/prototype.status.json
+design/nothing-red/branch/.*
+design/nothing-red/branch/*.json
+design/nothing-red/branch/*.jsonl
+design/nothing-red/branch/prototype/
