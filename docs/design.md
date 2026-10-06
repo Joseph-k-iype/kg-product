@@ -1,5 +1,7 @@
 # Business-user design
 
+Current visual system: Nothing-inspired light surfaces, red primary actions, Inter body text, Geist headings, and a live dashboard halftone shader. The earlier navy/serif design described below is retained as implementation history and has been superseded.
+
 The user's correction makes technical concepts secondary. Primary language is documents, concepts, attributes, rules, facts, checks, approvals, releases, evidence, and apps. Technical RDF source, vocabulary identifiers, graph mappings, model IDs, checksums, and release manifests are kept in Advanced views.
 
 12ui generated four first-view candidates. Candidate C supplied the chosen system: a 212px navy sidebar, pale neutral workspace, flat bordered blocks, restrained blue actions, serif page titles, clean business tables, and small text-paired status labels. Nine sibling states and their HTML exports are retained under `design/branch/`.
@@ -7,3 +9,17 @@ The user's correction makes technical concepts secondary. Primary language is do
 The 12ui clickable-prototype pipeline failed while making a holding page, after all nine screen and HTML exports succeeded. Navigation SVG markup, token values, page/block structures, and typography from those exports were adapted into React. Actual persisted actions, keyboard semantics, narrow layouts, and the guided five-step form required additional structure. Target-based comparison kits covered all nine reference states; unsafe positional matches were not applied blindly. Accessible darker green/amber status text was retained after axe checks found low contrast in the original colors.
 
 WeKnora informed the document-first onboarding, preparation timeline, and source-cited retrieval layout. This app retains its own release/governance model and the required PostgreSQL/pgvector, MinIO, RDF, and FalkorDB stack.
+
+## Nothing-inspired light redesign — October 6, 2026
+
+The user requested Nothing-inspired design, shaders, Inter with Geist, red as the primary color, a light theme, and Awwwards-inspired polish. The existing business workflows remain authoritative. The current system uses white/pale-gray surfaces, near-black text, fine neutral rules, red primary actions and active navigation indicators, a nine-dot identity, flat square blocks, Geist headings, Inter body/UI text, and Geist Mono for small index labels. All fonts are locally bundled from Fontsource 5.3.0, with no Google Fonts request.
+
+Four 12ui redesign candidates were inspected; D was selected. Its responsive export and three sibling states (catalog, creation, search) are retained in `design/nothing-red/branch/`. The current implementation applies the shared style to every route, keeping the real five-step creation flow and product/release selectors. Generated references contain a literal NOTHING logo, invented creation fields/dates, and some mismatched font identification; those do not replace Knowledge branding, persisted data, business forms, or the explicitly requested Inter/Geist pair. Busy secondary views retain clean titles without background motion.
+
+The dashboard uses an original WebGL fragment shader for a flowing red halftone field. The selected reference artwork is retained as the real static fallback in `frontend/public/artwork/knowledge-signal.png`. The shader respects reduced motion, has a keyboard-accessible pause control, caps pixel ratio and rendering frequency, suspends while hidden/offscreen, recovers after context loss, and deletes its GPU objects/listeners/observers on cleanup. Surface entrance motion changes position only, keeping text fully opaque throughout.
+
+Target-based comparison kits used the original unchanged LayerDocs. Dashboard matching passed the anchor gate (76.3%); catalog (35.2%), creation (55.6%), and search (28.6%) have lower overlap because their generated forms/context differ from the real workflows. Safe shared spacing, card radii, navigation weight, and label hierarchy were applied semantically. Brand substitutions, invented controls, unwanted illustration layers on secondary screens, detected Roboto, light low-contrast colors, and destructive positional diffs were excluded. These are intentional adaptations; this is not a pixel-perfect implementation of the generated screenshots.
+
+The final browser suite passes eight tests, including the complete creation-to-publication-to-cited-retrieval journey. A focused independent reviewer verified pause/resume, reduced motion, offscreen suspension, forced context loss/recovery, local font loading, GPU cleanup, and widths from 320 to 1440 pixels. No Critical or Important regression was found. The short-viewport sidebar suggestion was applied with vertical scrolling. Automating all additional runtime shader checks remains a minor testing improvement; the persistent tests currently cover reduced motion and unavailable WebGL.
+
+References: [Nothing](https://nothing.tech/), [Awwwards WebGL examples](https://www.awwwards.com/websites/webgl/), [Geist](https://vercel.com/font), [WebGL context recovery](https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_lose_context).

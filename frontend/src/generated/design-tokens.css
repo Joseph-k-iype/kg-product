@@ -1,15 +1,19 @@
-@import "./alignment-tokens.css";
-/* Adapted from retained 12ui p0-overview export: same typography, surfaces, geometry and colors. */
+/* Nothing-inspired light system; selected 12ui redesign D. */
 :root {
-  --nav: #152d47;
-  --nav-active: #2a4059;
-  --ink: #102f50;
-  --muted: #587193;
-  --surface: #fafbfd;
-  --line: #e1e7ee;
-  --accent: #0e4e86;
-  --radius: 8px;
-  --sidebar: 212px;
-  --heading: "Libre Baskerville", Georgia, serif;
-  --body: "Inter", system-ui, sans-serif;
+  color-scheme: light;
+  --nav: #f2f2f0;
+  --nav-active: #e9e9e6;
+  --ink: #191919;
+  --muted: #62625f;
+  --surface: #ffffff;
+  --canvas: #f8f8f6;
+  --line: #deded9;
+  --accent: #d52317;
+  --accent-hover: #b91e13;
+  --accent-soft: #fcedea;
+  --radius: 3px;
+  --sidebar: 232px;
+  --heading: "Geist Variable", sans-serif;
+  --body: "Inter Variable", sans-serif;
+  --mono: "Geist Mono Variable", monospace;
 }

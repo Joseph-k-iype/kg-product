@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useData } from "../api/client";
 import type { OverviewData, Product } from "../api/types";
+import { KnowledgeSignal } from "../components/KnowledgeSignal";
 import {
   Block,
   PageTitle,
@@ -122,20 +123,26 @@ export function Overview() {
   ] as const;
   return (
     <>
-      <PageTitle
-        eyebrow="KNOWLEDGE PLATFORM"
-        title="Your knowledge, ready to use."
-        description="Keep documents current, check quality, and publish with confidence."
-        action={
-          <Link className="button primary" to="/products/new">
-            <Plus size={16} />
-            New knowledge product
-          </Link>
-        }
-      />
+      <div className="overview-hero">
+        <KnowledgeSignal />
+        <PageTitle
+          eyebrow="KNOWLEDGE PLATFORM"
+          title="Your knowledge, ready to use."
+          description="Keep documents current, check quality, and publish with confidence."
+          action={
+            <Link className="button primary" to="/products/new">
+              <Plus size={16} />
+              New knowledge product
+            </Link>
+          }
+        />
+      </div>
       <div className="metrics">
-        {metrics.map(([label, value, Icon, help]) => (
+        {metrics.map(([label, value, Icon, help], index) => (
           <div className="metric-block" key={label}>
+            <span className="metric-index" aria-hidden="true">
+              0{index + 1}
+            </span>
             <Icon />
             <div>
               <div className="metric-label">{label}</div>

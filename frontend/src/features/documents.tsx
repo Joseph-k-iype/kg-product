@@ -75,7 +75,7 @@ export function DocumentsPage() {
         {!readonly && (
           <div className="block-body">
             <div className="upload-area">
-              <FileUp color="#245887" />
+              <FileUp color="var(--accent)" />
               <Field
                 label="Upload a document"
                 hint="PDF, Word, text or Markdown · up to 20 MB"

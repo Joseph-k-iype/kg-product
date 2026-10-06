@@ -15,6 +15,9 @@ import { CreateProduct } from "./features/create";
 import { Workspace, ContextPage, SourceRegistry } from "./features/product";
 import { useData } from "./api/client";
 import "./style.css";
+import "@fontsource-variable/inter";
+import "@fontsource-variable/geist";
+import "@fontsource-variable/geist-mono";
 function Operations() {
   const { data, error, loading } = useData<{
     probes: Record<string, string>;

@@ -1,8 +1,34 @@
 import { NavLink, Link, useLocation } from "react-router-dom";
-import { Bell, ChevronDown, Menu, X } from "lucide-react";
+import {
+  Bell,
+  ChevronDown,
+  Menu,
+  X,
+  LayoutGrid,
+  Archive,
+  Files,
+  Network,
+  Search,
+  ShieldCheck,
+  CircleCheck,
+  ScanSearch,
+  GitBranch,
+  Cable,
+} from "lucide-react";
 import { useState } from "react";
 import type { ReactNode } from "react";
-import icons from "../generated/navigation-icons.json";
+const navIcons = [
+  LayoutGrid,
+  Archive,
+  Files,
+  Network,
+  Search,
+  ShieldCheck,
+  CircleCheck,
+  ScanSearch,
+  GitBranch,
+  Cable,
+];
 const destinations = [
   ["/overview", "Overview"],
   ["/products", "Knowledge Products"],
@@ -33,7 +59,11 @@ export function Shell({ children }: { children: ReactNode }) {
       </a>
       <aside className={"sidebar " + (open ? "open" : "")}>
         <Link className="brand" to="/overview">
-          <span dangerouslySetInnerHTML={{ __html: icons[1] || "" }} />
+          <span className="brand-mark" aria-hidden="true">
+            {Array.from({ length: 9 }, (_, i) => (
+              <i key={i} />
+            ))}
+          </span>
           <span>
             Knowledge<span className="brand-sub">PRODUCT MANAGER</span>
           </span>
@@ -46,23 +76,24 @@ export function Shell({ children }: { children: ReactNode }) {
           <X />
         </button>
         <nav aria-label="Main navigation">
-          {destinations.map(([url, label], i) => (
-            <NavLink
-              key={url}
-              to={url}
-              onClick={() => setOpen(false)}
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              <span
-                className="nav-icon"
-                aria-hidden="true"
-                dangerouslySetInnerHTML={{
-                  __html: icons[i === 0 ? 0 : i + 1] || "",
-                }}
-              />
-              {label}
-            </NavLink>
-          ))}
+          {destinations.map(([url, label], i) => {
+            const Icon = navIcons[i];
+            return (
+              <NavLink
+                key={url}
+                to={url}
+                onClick={() => setOpen(false)}
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                <Icon
+                  className="nav-icon"
+                  aria-hidden="true"
+                  strokeWidth={1.6}
+                />
+                {label}
+              </NavLink>
+            );
+          })}
         </nav>
         <div className="sidebar-bottom">
           <span className="demo-dot" />

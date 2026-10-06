@@ -31,3 +31,9 @@ Deferred Minor: impact previews could list more historical shape/evaluation/rele
 Final full browser run: **6/6 passed** after context and correction fixes. Final backend run: **34/34 passed**. Frontend production build passed. The final container image was rebuilt with the corrected application source.
 
 Final corrected container smoke: FastAPI returned healthy status and all three storage adapters reported ready.
+
+## Light/red visual redesign
+
+After the user's Nothing/Inter/Geist/shader request, the full browser suite passed **8/8**. The production frontend build passed. New regressions verify unchanged decorative artwork under reduced motion and working dashboard/navigation when GPU access is denied. Both failed before the shader existed, then passed. The accessibility check reproduced a transient opacity/contrast failure, fixed by removing text fades; the full suite subsequently passed. Existing persisted creation, document preparation, quality checks, approvals, publication, cited retrieval, product switching, and correction scoping all still passed. Backend source was unchanged by this redesign.
+
+An independent reviewer also exercised shader pause/resume, offscreen suspension, context loss/restoration, GPU cleanup and font loading, with no Critical or Important findings. Browser captures are under `docs/screenshots/*-red.png`.
