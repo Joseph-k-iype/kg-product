@@ -29,3 +29,5 @@ The Docker image built successfully with torch 2.9.1+cpu. A container connected 
 Deferred Minor: impact previews could list more historical shape/evaluation/release dependencies. Current previews expose facts/mappings and required rebuild/check/review steps, and preserve published artifacts.
 
 Final full browser run: **6/6 passed** after context and correction fixes. Final backend run: **34/34 passed**. Frontend production build passed. The final container image was rebuilt with the corrected application source.
+
+Final corrected container smoke: FastAPI returned healthy status and all three storage adapters reported ready.
