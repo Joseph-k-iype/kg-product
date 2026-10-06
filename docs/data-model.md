@@ -76,7 +76,7 @@ Documents retain original name/type/size/object key/digest plus extracted artifa
 
 Source refresh compares original digest and normalized selection. Identical snapshots are reused; changed snapshots become current and prior snapshots are superseded only in the draft. Jobs for superseded documents are excluded or marked superseded. Current facts/checks/vector queries exclude inactive inputs.
 
-Chunks retain document/revision/product identity, ordinal, processing version, text offsets and optional `VECTOR(384)`. For extracted text, offsets refer to extracted text; normalized records use their generated evidence text rather than the raw byte layout of CSV/JSON/Turtle. Citations retain original URLs plus exact excerpt text, so a consumer can inspect the source representation.
+Chunks retain document/revision/product identity, ordinal, processing version, text offsets and optional `VECTOR(384)`. New DOCX extraction includes tables and nested cells in body order and records `extract-docx-v2/chunk-v1`; cached prepared documents retain their existing artifacts/version. For extracted text, offsets refer to extracted text; normalized records use their generated evidence text rather than the raw byte layout of CSV/JSON/Turtle. Citations retain original URLs plus exact excerpt text, so a consumer can inspect the source representation.
 
 The embedding identity is the tuple `(model_name, model_revision, model_dimension)`. Both document and query vectors use `sentence-transformers/all-MiniLM-L6-v2`, revision `1110a243fdf4706b3f48f1d95db1a4f5529b4d41`, dimension 384. A model mismatch prevents retrieval. DeepSeek is the answer model, not the embedding model.
 
@@ -96,7 +96,7 @@ Evaluation input snapshots include:
 - Chunk IDs/offsets/text digests and vector model identities.
 - Source synchronization timestamps, freshness windows/deadlines, and computed freshness.
 
-A SHA-256 hash of canonical JSON is the fingerprint. Evaluation results have measured values/thresholds/states/findings; reviews reference the same input hash. A change or freshness expiry can make evidence stale without deleting its history. Current passing checks and approval are checked again when publishing.
+Business text is trimmed in evaluation metadata snapshots so whitespace cannot satisfy completeness; old fingerprints containing outer whitespace become stale. A SHA-256 hash of canonical JSON is the fingerprint. Evaluation results have measured values/thresholds/states/findings; reviews reference the same input hash. A change or freshness expiry can make evidence stale without deleting its history. Current passing checks and approval are checked again when publishing.
 
 The release manifest extends the snapshot with exact document/chunk ID lists, ontology object key, embedding model, evaluation/review IDs, input hash, and graph key. Its bytes are stored and verified in MinIO; the release row keeps the same manifest JSON plus object key/digest. Release numbers are unique per product, and one revision can have only one release.
 

@@ -53,8 +53,9 @@ export function ConceptsPage() {
     [range, setRange] = useState("http://www.w3.org/2001/XMLSchema#string"),
     [target, setTarget] = useState(""),
     [property, setProperty] = useState(""),
+    [originalProperty, setOriginalProperty] = useState(""),
     [min, setMin] = useState(1),
-    [max, setMax] = useState(1),
+    [max, setMax] = useState<number | null>(1),
     [rdf, setRdf] = useState(""),
     [mapText, setMapText] = useState(""),
     [mode, setMode] = useState("merge"),
@@ -89,6 +90,7 @@ export function ConceptsPage() {
     setDomain("");
     setTarget("");
     setProperty("");
+    setOriginalProperty("");
     setMin(1);
     setMax(1);
   };
@@ -105,8 +107,9 @@ export function ConceptsPage() {
     } else {
       setTarget(item.target);
       setProperty(item.path);
+      setOriginalProperty(item.path);
       setMin(item.min_count);
-      setMax(item.max_count ?? 1);
+      setMax(item.max_count);
       setRange(item.datatype);
     }
   };
@@ -127,6 +130,7 @@ export function ConceptsPage() {
                 iri,
                 target,
                 path: property,
+                original_path: selected ? originalProperty : undefined,
                 min_count: min,
                 max_count: max,
                 datatype: range,
@@ -217,7 +221,7 @@ export function ConceptsPage() {
   return (
     <>
       <div className="guidance">
-        <h3>Define what your knowledge means.</h3>
+        <h2>Define what your knowledge means.</h2>
         <p>
           Concepts are the things your team talks about. Attributes describe
           them. Rules say what a complete, reliable fact must contain. Technical
@@ -307,9 +311,13 @@ export function ConceptsPage() {
             )
             .map((item) => (
               <div
-                key={item.iri}
+                key={item.iri + ("path" in item ? ":" + item.path : "")}
                 className={
-                  "concept-item " + (selected === item.iri ? "selected" : "")
+                  "concept-item " +
+                  (selected === item.iri &&
+                  (!("path" in item) || originalProperty === item.path)
+                    ? "selected"
+                    : "")
                 }
                 role="button"
                 tabIndex={0}
@@ -407,13 +415,21 @@ export function ConceptsPage() {
                       onChange={(e) => setMin(Number(e.target.value))}
                     />
                   </Field>
-                  <Field label="Maximum values">
+                  <Field
+                    label="Maximum values"
+                    hint="Leave empty for no maximum."
+                  >
                     <input
                       type="number"
                       min={min}
-                      value={max}
+                      value={max ?? ""}
+                      placeholder="No maximum"
                       disabled={readonly}
-                      onChange={(e) => setMax(Number(e.target.value))}
+                      onChange={(e) =>
+                        setMax(
+                          e.target.value === "" ? null : Number(e.target.value),
+                        )
+                      }
                     />
                   </Field>
                 </div>
@@ -439,7 +455,11 @@ export function ConceptsPage() {
                   {data.classes.find((c) => c.iri === target)?.label ||
                     "selected concept"}{" "}
                   must have{" "}
-                  {min === max ? `exactly ${min}` : `between ${min} and ${max}`}{" "}
+                  {max === null
+                    ? `at least ${min}`
+                    : min === max
+                      ? `exactly ${min}`
+                      : `between ${min} and ${max}`}{" "}
                   {data.properties.find((p) => p.iri === property)?.label ||
                     "selected attribute"}{" "}
                   value{max === 1 ? "" : "s"}.

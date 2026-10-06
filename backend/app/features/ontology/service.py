@@ -1,14 +1,17 @@
-import json, re
+import json
+import re
 from hashlib import sha256
-from sqlalchemy import select, func
+
 from fastapi import HTTPException
-from rdflib import Graph, URIRef, Literal, BNode
-from rdflib.namespace import RDF, RDFS, OWL, SH, XSD
-from app.features.ontology.models import OntologyVersion, MappingVersion
-from app.features.products.service import touch, require
+from rdflib import BNode, Graph, Literal, URIRef
+from rdflib.namespace import OWL, RDF, RDFS, SH, XSD
+from sqlalchemy import func, select
+
 from app.adapters.ontology import OntologyAdapter, iri
 from app.adapters.storage import ObjectStore
 from app.domain.contracts import ArtifactRef
+from app.features.ontology.models import MappingVersion, OntologyVersion
+from app.features.products.service import require, touch
 
 adapter = OntologyAdapter()
 
@@ -153,10 +156,9 @@ def proposed_edit(session, rev, edit):
             proposed = Graph()
             proposed += g
             proposed.remove((node, None, None))
-            serialized = proposed.serialize(format="turtle")
             g = proposed
         elif edit.kind == "shape":
-            if not (node, RDF.type, SH.NodeShape) in g:
+            if (node, RDF.type, SH.NodeShape) not in g:
                 g.add((node, RDF.type, SH.NodeShape))
             if (iri(edit.target), RDF.type, OWL.Class) not in g and (
                 iri(edit.target),
@@ -167,33 +169,43 @@ def proposed_edit(session, rev, edit):
             if edit.max_count is not None and edit.min_count > edit.max_count:
                 raise ValueError("Minimum cannot exceed maximum")
             g.set((node, SH.targetClass, iri(edit.target)))
-            for previous in list(g.objects(node, SH.property)):
-                g.remove((previous, None, None))
-            g.remove((node, SH.property, None))
-            prop = BNode()
+            original_path = iri(edit.original_path or edit.path)
+            matching = [
+                prop for prop in g.objects(node, SH.property) if g.value(prop, SH.path) == original_path
+            ]
+            if len(matching) > 1:
+                raise ValueError("This rule has multiple constraints for that path. Edit its Turtle in Advanced.")
+            prop = matching[0] if matching else BNode()
             g.add((node, SH.property, prop))
-            g.add((prop, SH.path, iri(edit.path)))
-            g.add((prop, SH.minCount, Literal(edit.min_count, datatype=XSD.integer)))
+            g.set((prop, SH.path, iri(edit.path)))
+            g.set((prop, SH.minCount, Literal(edit.min_count, datatype=XSD.integer)))
+            g.remove((prop, SH.maxCount, None))
             if edit.max_count is not None:
                 g.add((prop, SH.maxCount, Literal(edit.max_count, datatype=XSD.integer)))
+            g.remove((prop, SH.datatype, None))
             if edit.datatype:
                 g.add((prop, SH.datatype, iri(edit.datatype)))
         else:
             type = {"class": OWL.Class, "object": OWL.ObjectProperty, "datatype": OWL.DatatypeProperty}[
                 edit.kind
             ]
-            existing = set(g.objects(node, RDF.type)) & {OWL.Class, OWL.ObjectProperty, OWL.DatatypeProperty}
-            if existing and type not in existing:
+            class_kinds = {OWL.Class, RDFS.Class}
+            existing = set(g.objects(node, RDF.type)) & (class_kinds | {OWL.ObjectProperty, OWL.DatatypeProperty})
+            compatible = class_kinds if edit.kind == "class" else {type}
+            if existing - compatible:
                 raise ValueError("An identifier cannot change concept/property kind")
-            g.add((node, RDF.type, type))
+            if not existing:
+                g.add((node, RDF.type, type))
             g.set((node, RDFS.label, Literal(edit.label or edit.iri.rsplit("/", 1)[-1])))
             g.set((node, RDFS.comment, Literal(edit.description)))
-            if edit.parent:
-                g.set((node, RDFS.subClassOf, iri(edit.parent)))
-            if edit.domain:
-                g.set((node, RDFS.domain, iri(edit.domain)))
-            if edit.range:
-                g.set((node, RDFS.range, iri(edit.range)))
+            for value, predicate in (
+                (edit.parent, RDFS.subClassOf), (edit.domain, RDFS.domain), (edit.range, RDFS.range)
+            ):
+                if value is not None:
+                    if value:
+                        g.set((node, predicate, iri(value)))
+                    else:
+                        g.remove((node, predicate, None))
         return g
     except HTTPException:
         raise

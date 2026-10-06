@@ -1,6 +1,7 @@
 from fastapi import HTTPException
-from sqlalchemy import select, func
-from app.features.products.models import Product, Revision, Activity
+from sqlalchemy import func, select
+
+from app.features.products.models import Activity, Product, Revision
 
 
 def require(session, model, id):
@@ -44,8 +45,8 @@ def touch(session, rev, action, expected=None):
     # Dependent evidence is invalidated by captured generation; no historical rows are deleted.
 
 
-def detail(session, product):
-    revs = session.scalars(
+def detail(session, product, *, revisions=None):
+    revs = revisions if revisions is not None else session.scalars(
         select(Revision).where(Revision.product_id == product.id).order_by(Revision.number.desc())
     ).all()
     drafts = [r for r in revs if r.state != "published"]
@@ -87,10 +88,16 @@ def create_product(session, input):
     return detail(session, product)
 
 
-def update_draft(session, product_id, input):
-    product = session.scalars(select(Product).where(Product.id == str(product_id)).with_for_update()).first()
+def lock_product(session, product_id):
+    # Non-key updates permit FK KEY SHARE checks while serializing catalog edits.
+    product = session.scalars(select(Product).where(Product.id == str(product_id)).with_for_update(key_share=True)).first()
     if not product:
         require(session, Product, product_id)
+    return product
+
+
+def update_draft(session, product_id, input):
+    product = lock_product(session, product_id)
     rev = revision(session, product.id, lock=True)
     touch(session, rev, "Product details updated", input.expected_generation)
     for key, value in input.model_dump(exclude={"expected_generation"}, exclude_none=True).items():
@@ -103,8 +110,7 @@ def update_draft(session, product_id, input):
 
 
 def open_draft(session, product_id):
-    product = require(session, Product, product_id)
-    session.execute(select(Product).where(Product.id == product.id).with_for_update())
+    product = lock_product(session, product_id)
     existing = session.scalars(
         select(Revision).where(Revision.product_id == product.id, Revision.state != "published")
     ).first()
@@ -122,7 +128,7 @@ def open_draft(session, product_id):
     )
     session.add(rev)
     session.flush()
-    from app.features.documents.models import Document, Chunk
+    from app.features.documents.models import Chunk, Document
 
     docs = session.scalars(select(Document).where(Document.revision_id == latest.id, Document.active.is_(True))).all()
     for old in docs:

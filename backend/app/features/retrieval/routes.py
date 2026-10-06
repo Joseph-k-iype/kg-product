@@ -1,11 +1,14 @@
+from dataclasses import asdict
+from typing import Literal
+
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
-from typing import Literal
-from dataclasses import asdict
+
 from app.db import get_session
+from app.domain.contracts import EmbeddingModelInput
+from app.features.products.service import revision, touch
 from app.features.retrieval import service
 from app.features.retrieval.models import EvaluationCase
-from app.features.products.service import revision, touch
 
 router = APIRouter(prefix="/api")
 
@@ -15,7 +18,7 @@ class RetrievalInput(BaseModel):
     preview: bool = False
     revision_id: str | None = None
     release_id: str | None = None
-    model: dict | None = None
+    model: EmbeddingModelInput | None = None
     mode: Literal["vector", "graph", "hybrid"] = "vector"
     limit: int = Field(5, ge=1, le=50)
 

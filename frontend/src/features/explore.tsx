@@ -44,7 +44,7 @@ export function ExplorerPage() {
   return (
     <>
       <div className="guidance">
-        <h3>Explore facts, with the evidence behind them.</h3>
+        <h2>Explore facts, with the evidence behind them.</h2>
         <p>
           Explore imported records and facts supported by documents. Open a
           record to see its attributes, relationships, and original evidence.
@@ -267,7 +267,7 @@ export function LineagePage() {
   return (
     <>
       <div className="guidance">
-        <h3>Follow your knowledge back to its source.</h3>
+        <h2>Follow your knowledge back to its source.</h2>
         <p>
           Every excerpt, fact, and release keeps its supporting evidence. This
           trail describes revision {revision.number}; connected apps appear when

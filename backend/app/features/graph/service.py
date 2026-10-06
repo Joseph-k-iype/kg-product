@@ -1,16 +1,18 @@
-from uuid import uuid5, NAMESPACE_URL
-import json, re
+import json
+import re
 from hashlib import sha256
-from sqlalchemy import select
+from uuid import NAMESPACE_URL, uuid5
+
 from fastapi import HTTPException
-from app.features.products.models import uid
-from app.features.products.service import require, mutable
+from sqlalchemy import select
+
+from app.adapters.graph import GraphAdapter
+from app.config import settings
+from app.features.documents.models import Chunk, Document
 from app.features.graph.models import GraphBuild
 from app.features.ontology.models import MappingVersion
 from app.features.ontology.service import details
-from app.features.documents.models import Chunk, Document
-from app.adapters.graph import GraphAdapter
-from app.config import settings
+from app.features.products.service import mutable, require
 
 adapter = GraphAdapter()
 
@@ -61,6 +63,21 @@ def build_graph(session, rev):
     )
     if not chunks or any(not d.extracted_text for d in docs):
         raise HTTPException(409, "Prepare all document excerpts first")
+    property_keys = {p["iri"]: p["key"] for p in mapping.definition["properties"]}
+    required_properties = set()
+    for doc in docs:
+        if doc.data_kind in ("csv", "json", "turtle"):
+            for record in doc.structured_data["records"]:
+                required_properties.update(record["values"])
+            required_properties.update(edge["iri"] for edge in doc.structured_data["relationships"])
+    if required_properties - property_keys.keys():
+        raise HTTPException(
+            409,
+            {
+                "code": "unmapped_properties",
+                "message": "Some imported attributes or relationships need representation settings in Advanced before preparing facts.",
+            },
+        )
     fingerprint = sha256(
         json.dumps(
             {
@@ -82,7 +99,6 @@ def build_graph(session, rev):
     nodes = {}
     edges = []
     documents = {d.id: d for d in docs}
-    property_keys = {p["iri"]: p["key"] for p in mapping.definition["properties"]}
     property_labels = {p["iri"]: p["label"] for p in ontology["properties"]}
     class_labels = {c["iri"]: c["label"] for c in ontology["classes"]}
     scoped_ids = {}

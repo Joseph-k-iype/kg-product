@@ -52,7 +52,7 @@ export function RetrievalPage() {
   return (
     <>
       <div className="guidance">
-        <h3>Find answers. See the evidence.</h3>
+        <h2>Find answers. See the evidence.</h2>
         <p>
           Search ranks passages from your selected version. Read the evidence
           and open the original document to verify it. This MVP returns evidence

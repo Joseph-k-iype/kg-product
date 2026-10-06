@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from uuid import UUID
 
+from pydantic import BaseModel, ConfigDict, Field
+
 
 @dataclass(frozen=True)
 class RevisionRef:
@@ -36,3 +38,10 @@ class Evidence:
 class RetrievalHit:
     evidence: Evidence
     score: float
+
+
+class EmbeddingModelInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    name: str = Field(min_length=1)
+    revision: str = Field(min_length=1)
+    dimension: int = Field(strict=True, ge=1)

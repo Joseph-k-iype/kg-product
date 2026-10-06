@@ -235,6 +235,33 @@
         "title": "DecisionInput",
         "type": "object"
       },
+      "EmbeddingModelInput": {
+        "additionalProperties": false,
+        "properties": {
+          "dimension": {
+            "minimum": 1.0,
+            "title": "Dimension",
+            "type": "integer"
+          },
+          "name": {
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "revision": {
+            "minLength": 1,
+            "title": "Revision",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "revision",
+          "dimension"
+        ],
+        "title": "EmbeddingModelInput",
+        "type": "object"
+      },
       "FlagInput": {
         "properties": {
           "reason": {
@@ -355,9 +382,15 @@
             "type": "string"
           },
           "domain": {
-            "default": "",
-            "title": "Domain",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domain"
           },
           "expected_generation": {
             "anyOf": [
@@ -420,10 +453,27 @@
             "title": "Min Count",
             "type": "integer"
           },
+          "original_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original Path"
+          },
           "parent": {
-            "default": "",
-            "title": "Parent",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent"
           },
           "path": {
             "default": "",
@@ -436,9 +486,15 @@
             "type": "string"
           },
           "range": {
-            "default": "",
-            "title": "Range",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Range"
           },
           "target": {
             "default": "",
@@ -604,14 +660,12 @@
           "model": {
             "anyOf": [
               {
-                "additionalProperties": true,
-                "type": "object"
+                "$ref": "#/components/schemas/EmbeddingModelInput"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Model"
+            ]
           },
           "preview": {
             "default": false,

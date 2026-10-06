@@ -26,6 +26,8 @@ Start with the [project README](../README.md) to run the application, or the [bu
 
 ## Evidence and historical decisions
 
+- [Full QA and root-cause report](qa-report.md): reproduced defects, fixes, regression coverage, and final executed checks.
+
 - [Verification record](verification.md): actual executed checks and known limits by implementation stage.
 - [Implementation decisions](implementation-decisions.md): decisions and tradeoffs made during development.
 - [Design notes](design.md) and [design spending](design-spend.md): retained reference provenance and constraints.

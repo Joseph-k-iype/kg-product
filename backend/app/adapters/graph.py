@@ -1,5 +1,9 @@
-import json, re
+import json
+import re
+
+from fastapi import HTTPException
 from redis import Redis
+
 from app.config import settings
 
 
@@ -65,6 +69,9 @@ class GraphAdapter:
             f'MATCH (n) WHERE (toLower(n.label) CONTAINS toLower($query) OR toLower(n.id) CONTAINS toLower($query)) AND ($type="" OR n.type=$type) RETURN n.id,n.type,n.label,n.iri,n.attributes,n.evidence ORDER BY n.label LIMIT {limit}',
             {"query": query, "type": entity_type or ""},
         )
+        return self._entities(build, rows)
+
+    def _entities(self, build, rows):
         metadata = {n["id"]: n for n in build.instances}
         return [
             {
@@ -83,9 +90,19 @@ class GraphAdapter:
             for r in rows
         ]
 
+    def _entity(self, build, entity_id):
+        rows = self.query(
+            build.graph_key,
+            "MATCH (n {id:$id}) RETURN n.id,n.type,n.label,n.iri,n.attributes,n.evidence LIMIT 1",
+            {"id": entity_id},
+        )
+        return self._entities(build, rows)
+
     def neighbors(self, build, entity_id, limit=20):
         limit = max(1, min(int(limit), 50))
-        root = self.search(build, entity_id, None, 1)
+        root = self._entity(build, entity_id)
+        if not root:
+            raise HTTPException(404, {"code": "fact_not_found", "message": "Fact not found"})
         rows = self.query(
             build.graph_key,
             f"MATCH (a {{id:$id}})-[r]-(b) RETURN b.id,type(r),startNode(r).id,endNode(r).id,r.evidence LIMIT {max(0, limit - 1)}",
@@ -94,7 +111,7 @@ class GraphAdapter:
         nodes = root[:1]
         edges = []
         for row in rows:
-            match = self.search(build, row[0], None, 1)
+            match = self._entity(build, row[0])
             if match and all(n["id"] != match[0]["id"] for n in nodes):
                 nodes += match
             edges.append({"source": row[2], "target": row[3], "type": row[1], "evidence": json.loads(row[4])})

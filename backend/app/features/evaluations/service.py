@@ -1,20 +1,22 @@
-from datetime import timedelta
 import json
-from hashlib import sha256
-from sqlalchemy import select
-from rdflib import Graph, URIRef, Literal
-from rdflib.namespace import RDF, XSD
-from fastapi import HTTPException
-from app.features.products.service import require
-from app.features.products.models import Product, now
-from app.features.documents.models import Document, Chunk
-from app.features.ontology.models import OntologyVersion, MappingVersion
-from app.features.graph.models import GraphBuild
-from app.features.ontology.service import details, adapter
-from app.features.sources.models import Source
-from app.features.evaluations.models import EvaluationRun
-from app.features.retrieval.service import default_model
 from dataclasses import asdict
+from datetime import timedelta
+from hashlib import sha256
+
+from fastapi import HTTPException
+from rdflib import Graph, Literal, URIRef
+from rdflib.namespace import RDF, XSD
+from sqlalchemy import select
+
+from app.features.documents.models import Chunk, Document
+from app.features.evaluations.models import EvaluationRun
+from app.features.graph.models import GraphBuild
+from app.features.ontology.models import MappingVersion, OntologyVersion
+from app.features.ontology.service import adapter, details
+from app.features.products.models import Product, now
+from app.features.products.service import require
+from app.features.retrieval.service import default_model
+from app.features.sources.models import Source
 
 
 def source_freshness(session, docs):
@@ -37,14 +39,14 @@ def source_freshness(session, docs):
     return inputs
 
 
-def snapshot(session, rev):
+def snapshot(session, rev, *, documents=None, chunks=None):
     product = require(session, Product, rev.product_id)
-    docs = session.scalars(
+    docs = documents if documents is not None else session.scalars(
         select(Document)
         .where(Document.revision_id == rev.id, Document.active.is_(True))
         .order_by(Document.id)
     ).all()
-    chunks = session.scalars(
+    chunks = chunks if chunks is not None else session.scalars(
         select(Chunk)
         .join(Document)
         .where(Chunk.revision_id == rev.id, Document.active.is_(True))
@@ -57,10 +59,10 @@ def snapshot(session, rev):
         "revision_id": rev.id,
         "generation": rev.generation,
         "metadata": {
-            "name": product.name,
-            "purpose": product.purpose,
-            "domain": product.domain,
-            "owner": product.owner,
+            "name": product.name.strip(),
+            "purpose": product.purpose.strip(),
+            "domain": product.domain.strip(),
+            "owner": product.owner.strip(),
             "tags": product.tags,
         },
         "config": rev.config,
@@ -107,8 +109,8 @@ def fingerprint(inputs):
     return sha256(json.dumps(inputs, sort_keys=True).encode()).hexdigest()
 
 
-def run_detail(session, run, rev):
-    current = run.input_hash == fingerprint(snapshot(session, rev))
+def run_detail(session, run, rev, *, current_input_hash=None):
+    current = run.input_hash == (current_input_hash or fingerprint(snapshot(session, rev)))
     return {
         "id": run.id,
         "revision_id": run.revision_id,

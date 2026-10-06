@@ -1,17 +1,19 @@
 import json
 from dataclasses import asdict
-from sqlalchemy import select, func
+
 from fastapi import HTTPException
-from app.features.products.service import require, mutable
-from app.features.products.models import Product, Activity
-from app.features.releases.models import Release
-from app.features.reviews.models import Review
-from app.features.evaluations.service import current_pass, snapshot, fingerprint
-from app.features.ontology.models import OntologyVersion
-from app.features.graph.models import GraphBuild
-from app.adapters.storage import ObjectStore
+from sqlalchemy import func, select
+
 from app.adapters.graph import GraphAdapter
+from app.adapters.storage import ObjectStore
+from app.features.evaluations.service import current_pass, fingerprint, snapshot
+from app.features.graph.models import GraphBuild
+from app.features.ontology.models import OntologyVersion
+from app.features.products.models import Activity
+from app.features.products.service import lock_product, mutable, require
+from app.features.releases.models import Release
 from app.features.retrieval.service import default_model
+from app.features.reviews.models import Review
 
 store = ObjectStore()
 graph = GraphAdapter()
@@ -82,7 +84,7 @@ def prepare_release(session, rev):
 
 
 def activate_release(session, rev):
-    product = session.scalars(select(Product).where(Product.id == rev.product_id).with_for_update()).one()
+    product = lock_product(session, rev.product_id)
     manifest, artifact = prepare_release(session, rev)
     if manifest["input_hash"] != fingerprint(snapshot(session, rev)):
         raise HTTPException(409, "Draft changed during publication")

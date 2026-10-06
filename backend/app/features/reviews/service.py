@@ -1,14 +1,17 @@
-from sqlalchemy import select
+import json
+
 from fastapi import HTTPException
-from app.features.reviews.models import Review
-from app.features.products.models import Product, Revision, Activity
-from app.features.products.service import require, mutable
+from sqlalchemy import select
+
 from app.features.evaluations.service import current_pass, fingerprint, snapshot
+from app.features.products.models import Activity, Product, Revision
+from app.features.products.service import mutable, require
+from app.features.reviews.models import Review
 
 
-def review_detail(session, review):
+def review_detail(session, review, *, current_input_hash=None):
     rev = require(session, Revision, review.revision_id)
-    current = review.input_hash == fingerprint(snapshot(session, rev))
+    current = review.input_hash == (current_input_hash or fingerprint(snapshot(session, rev)))
     return {
         "id": review.id,
         "product_id": review.product_id,
@@ -29,13 +32,23 @@ def review_detail(session, review):
 def definition_diff(before, after):
     def indexed(inputs):
         result = {}
-        for category in ["classes", "properties", "shapes"]:
+        for category in ["classes", "properties"]:
             for entry in inputs.get("definitions", {}).get(category, []):
                 result[entry["iri"]] = {
                     **entry,
                     "kind": category,
                     "label": entry.get("label") or entry["iri"].rsplit("/", 1)[-1],
                 }
+        shapes = {}
+        for entry in inputs.get("definitions", {}).get("shapes", []):
+            shapes.setdefault(entry["iri"], []).append(entry)
+        for identifier, constraints in shapes.items():
+            result[identifier] = {
+                "iri": identifier,
+                "kind": "shapes",
+                "label": identifier.rsplit("/", 1)[-1],
+                "constraints": sorted(constraints, key=lambda entry: json.dumps(entry, sort_keys=True)),
+            }
         return result
 
     old = indexed(before or {})

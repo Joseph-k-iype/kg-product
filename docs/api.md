@@ -12,7 +12,7 @@ The checked-in [OpenAPI 3.1 specification](api/openapi.json) and [endpoint inven
 - The product catalog returns `{items,total,offset,limit}`. Other list endpoints often return arrays; entities return `{items,build}`. Pagination is route-specific.
 - The local API has no authentication or authorization layer. Demo reviewer fields are workflow simulation, not identity proof.
 - SQL session dependencies commit before returning a successful response. Errors roll back relational mutations.
-- Source credentials and model keys are server environment values. Never place secrets in source `config`, frontend variables, or chat payloads.
+- Product configuration validates finite quality thresholds (0–1), matching-result limits (1–50), and complete embedding-model identity before persistence. Search model overrides use a typed request schema. Source credentials and model keys are server environment values. Never place secrets in source `config`, frontend variables, or chat payloads.
 
 **Schema limits:** many handlers return untyped dictionaries or ORM objects. Their response schemas in OpenAPI are generic, and runtime 409/503 errors may not be declared. The generated schema also declares generic success JSON on some handlers that actually return bytes or a text stream. Actual media types for original documents, Turtle export, and chat are described below. Requests have stronger typed validation than most responses. This document describes implemented behavior rather than promising a fully typed client SDK.
 
@@ -201,3 +201,7 @@ Example conflict:
 ```
 
 Do not blindly retry mutating calls after a network timeout: fetch current product/review/release state first. Upload/snapshot/job/build deduplication is input-specific; the API does not implement a general `Idempotency-Key` contract. `/api/health` returns HTTP 200 with per-service `ready`/`unavailable` values, so monitoring must inspect the JSON body. No API version prefix or compatibility policy is established beyond this local MVP; regenerate/reference-check docs with every contract change.
+
+## Rule edit semantics
+
+For ontology edits, omitted or null `parent`, `domain`, and `range` preserve the existing links; an explicit empty string removes the link. A shape edit can supply `original_path` to identify the property being changed while preserving sibling constraints. `max_count: null` means unbounded. Supported cardinalities must be nonnegative integers with minimum no greater than maximum. Malformed rules fail before persistence.

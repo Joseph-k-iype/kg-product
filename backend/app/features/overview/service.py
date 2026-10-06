@@ -1,50 +1,66 @@
-from sqlalchemy import select
+from collections import defaultdict
+from datetime import timedelta
+
+from sqlalchemy import or_, select
+
+from app.features.consumers.models import Consumer
+from app.features.documents.models import Chunk, Document
+from app.features.evaluations.models import EvaluationRun
+from app.features.evaluations.service import fingerprint, run_detail, snapshot
+from app.features.ontology.models import MappingVersion, OntologyVersion
+from app.features.processing.models import Job
 from app.features.products.models import Product, Revision, now
 from app.features.products.service import detail
-from app.features.documents.models import Document, Chunk
-from app.features.processing.models import Job
-from app.features.evaluations.models import EvaluationRun
-from app.features.evaluations.service import run_detail
-from app.features.reviews.models import Review
-from app.features.reviews.service import review_detail
 from app.features.releases.models import Release
 from app.features.releases.service import release_detail
+from app.features.reviews.models import Review
+from app.features.reviews.service import review_detail
 from app.features.sources.models import Source
-from app.features.consumers.models import Consumer
 
 
 def overview(session):
     products = session.scalars(select(Product).order_by(Product.name)).all()
     rows = []
     attention = []
-    reviews = [review_detail(session, r) for r in session.scalars(select(Review))]
+    # Load catalog inputs once. Retain model references so the session identity
+    # map can resolve snapshot FK reads without one query per record.
+    def grouped(records, key):
+        groups = defaultdict(list)
+        for record in records:
+            groups[getattr(record, key)].append(record)
+        return groups
+
+    revisions = grouped(session.scalars(select(Revision).order_by(Revision.number.desc())).all(), "product_id")
+    documents = grouped(session.scalars(select(Document).where(Document.active.is_(True)).order_by(Document.id)).all(), "revision_id")
+    excerpts = grouped(session.scalars(select(Chunk).join(Document).where(Document.active.is_(True)).order_by(Chunk.id)).all(), "revision_id")
+    evaluations = grouped(session.scalars(select(EvaluationRun).order_by(EvaluationRun.created_at.desc())).all(), "revision_id")
+    failures = grouped(session.scalars(select(Job).outerjoin(Document).where(Job.state == "failed", or_(Job.document_id.is_(None), Document.active.is_(True)))).all(), "revision_id")
+    consumers = grouped(session.scalars(select(Consumer)).all(), "product_id")
+    sources = session.scalars(select(Source)).all()
+    _versions = [*session.scalars(select(OntologyVersion)), *session.scalars(select(MappingVersion))]
+    hashes = {}
+
+    def current_hash(rev):
+        if rev.id not in hashes:
+            hashes[rev.id] = fingerprint(snapshot(session, rev, documents=documents[rev.id], chunks=excerpts[rev.id]))
+        return hashes[rev.id]
+
+    reviews = [review_detail(session, r, current_input_hash=current_hash(session.get(Revision, r.revision_id))) for r in session.scalars(select(Review))]
     for p in products:
-        info = detail(session, p)
-        rev = session.scalars(
-            select(Revision).where(Revision.product_id == p.id).order_by(Revision.number.desc())
-        ).first()
-        docs = session.scalars(
-            select(Document).where(
-                Document.revision_id == rev.id, Document.active.is_(True), Document.data_kind != "definitions"
-            )
-        ).all()
-        chunks = session.scalars(
-            select(Chunk).join(Document).where(Chunk.revision_id == rev.id, Document.active.is_(True))
-        ).all()
+        info = detail(session, p, revisions=revisions[p.id])
+        rev = revisions[p.id][0]
+        docs = [d for d in documents[rev.id] if d.data_kind != "definitions"]
+        chunks = excerpts[rev.id]
         ready = sum(
             bool(d.extracted_text)
             and all(c.embedding is not None for c in chunks if c.document_id == d.id)
             and any(c.document_id == d.id for c in chunks)
             for d in docs
         )
-        evaluation = session.scalars(
-            select(EvaluationRun)
-            .where(EvaluationRun.revision_id == rev.id)
-            .order_by(EvaluationRun.created_at.desc())
-        ).first()
-        quality = run_detail(session, evaluation, rev)["state"] if evaluation else "not_checked"
-        jobs = session.scalars(select(Job).where(Job.revision_id == rev.id, Job.state == "failed")).all()
-        consumer_count = len(session.scalars(select(Consumer).where(Consumer.product_id == p.id)).all())
+        evaluation = evaluations[rev.id][0] if evaluations[rev.id] else None
+        quality = run_detail(session, evaluation, rev, current_input_hash=current_hash(rev))["state"] if evaluation else "not_checked"
+        jobs = failures[rev.id]
+        consumer_count = len(consumers[p.id])
         publication = "published" if not info["draft"] else info["draft"]["state"]
         row = {
             **info,
@@ -129,8 +145,8 @@ def overview(session):
                 }
             )
     overdue = []
-    for source in session.scalars(select(Source)):
-        if source.last_synced_at is None or (now() - source.last_synced_at).days > source.freshness_days:
+    for source in sources:
+        if source.last_synced_at is None or now() > source.last_synced_at + timedelta(days=source.freshness_days):
             overdue.append(source)
             attention.append(
                 {

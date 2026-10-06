@@ -1,13 +1,15 @@
 import math
 import time
 from dataclasses import asdict
+
 from fastapi import HTTPException
 from sqlalchemy import select
-from app.features.products.service import revision, require
-from app.features.products.models import Product
-from app.features.documents.models import Chunk, Document
+
+from app.adapters.embeddings import MODEL_NAME, MODEL_REVISION, EmbeddingProvider
 from app.domain.contracts import ModelRef
-from app.adapters.embeddings import EmbeddingProvider, MODEL_NAME, MODEL_REVISION
+from app.features.documents.models import Chunk, Document
+from app.features.products.models import Product
+from app.features.products.service import require, revision
 
 provider = EmbeddingProvider()
 
@@ -113,7 +115,7 @@ def retrieve(session, pid, input):
         if release
         else rev.config.get("embedding_model", asdict(default_model()))
     )
-    model = ModelRef(**(input.model or config))
+    model = ModelRef(**(input.model.model_dump() if input.model else config))
     if input.mode == "vector":
         results = search_vector(session, rev, model, input.query, input.limit, chunk_ids)
     elif input.mode == "graph":

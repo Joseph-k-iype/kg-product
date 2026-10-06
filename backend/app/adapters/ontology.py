@@ -1,7 +1,8 @@
 from urllib.parse import urlparse
-from rdflib import Graph, URIRef, Literal, BNode
-from rdflib.namespace import RDF, RDFS, OWL, SH, XSD
+
 from pyshacl import validate
+from rdflib import Graph, Literal, URIRef
+from rdflib.namespace import OWL, RDF, RDFS, SH
 
 SUPPORTED_OWL = {OWL.Class, OWL.ObjectProperty, OWL.DatatypeProperty, OWL.Ontology}
 SUPPORTED_SH = {
@@ -39,7 +40,25 @@ class OntologyAdapter:
     def parse(self, turtle: str) -> Graph:
         if len(turtle) > 2 * 1024 * 1024:
             raise ValueError("Definition file exceeds 2 MB")
-        return Graph().parse(data=turtle, format="turtle")
+        graph = Graph().parse(data=turtle, format="turtle")
+        self.validate_cardinalities(graph)
+        return graph
+
+    def validate_cardinalities(self, graph: Graph):
+        subjects = set(graph.subjects(SH.minCount, None)) | set(graph.subjects(SH.maxCount, None))
+        for subject in subjects:
+            counts = {}
+            for predicate in (SH.minCount, SH.maxCount):
+                values = list(graph.objects(subject, predicate))
+                if len(values) > 1:
+                    raise ValueError("Each rule must have a single minimum and maximum count.")
+                if values:
+                    value = values[0].toPython() if isinstance(values[0], Literal) else None
+                    if type(value) is not int or value < 0:
+                        raise ValueError("Rule minimum and maximum counts must be nonnegative integers.")
+                    counts[predicate] = value
+            if SH.maxCount in counts and counts.get(SH.minCount, 0) > counts[SH.maxCount]:
+                raise ValueError("Rule minimum count cannot exceed its maximum count.")
 
     def unsupported(self, g: Graph) -> list[str]:
         found = set()

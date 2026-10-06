@@ -68,7 +68,7 @@ sequenceDiagram
     U->>A: Prepare selected revision
     A->>P: Enqueue input-scoped jobs
     W->>P: Claim queued / expired job with row lock
-    W->>M: Read original; store extracted text
+    W->>M: Read original and store extracted text
     W->>P: Create chunks and pinned model vectors
     W->>F: Build versioned evidence-backed graph
     W->>P: Save build, evaluate, commit attempts

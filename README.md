@@ -132,6 +132,7 @@ make test-e2e     # running API/worker/frontend; installs Chromium if needed
 make build        # TypeScript check and Vite production output
 make docs         # regenerate public API and ORM reference files
 make docs-check   # fail on reference drift; no model/provider calls
+# make test-e2e also renders every Mermaid diagram using the pinned browser renderer
 ```
 
 Backend tests use a dedicated `knowledge_test` database. Browser tests use the running local workspace and retain inspectable synthetic QA products. The [verification record](docs/verification.md) records actual executed results and distinguishes runtime acceptance from provider test doubles. Browser chat tests stub the external generation seam; separate real DeepSeek calls verified the complete agent/gateway path.

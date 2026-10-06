@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
+
 from app.db import get_session
-from app.features.products.service import revision, require
+from app.features.products.service import lock_product, require, revision
 from app.features.releases import service
 from app.features.releases.models import Release
 
@@ -10,6 +11,7 @@ router = APIRouter(prefix="/api/products/{id}/releases")
 
 @router.post("", status_code=201)
 def publish(id: str, session=Depends(get_session, scope="function")):
+    lock_product(session, id)
     return service.activate_release(session, revision(session, id, lock=True))
 
 

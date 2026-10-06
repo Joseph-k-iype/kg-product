@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
 from typing import Literal
+
+from pydantic import BaseModel, Field
 
 
 class OntologyEdit(BaseModel):
@@ -7,11 +8,12 @@ class OntologyEdit(BaseModel):
     iri: str
     label: str = ""
     description: str = ""
-    parent: str = ""
-    domain: str = ""
-    range: str = ""
+    parent: str | None = None
+    domain: str | None = None
+    range: str | None = None
     target: str = ""
     path: str = ""
+    original_path: str | None = None
     min_count: int = Field(0, ge=0)
     max_count: int | None = Field(None, ge=0)
     datatype: str = ""
