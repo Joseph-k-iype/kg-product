@@ -18,32 +18,19 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import type { ReactNode } from "react";
-const navIcons = [
-  LayoutGrid,
-  Archive,
-  Files,
-  Network,
-  Search,
-  ShieldCheck,
-  CircleCheck,
-  ScanSearch,
-  GitBranch,
-  Cable,
-  MessageSquare,
-];
 const destinations = [
-  ["/overview", "Overview"],
-  ["/products", "Knowledge Products"],
-  ["/sources", "Documents & Sources"],
-  ["/concepts", "Concepts & Rules"],
-  ["/explorer", "Explore Knowledge"],
-  ["/health", "Quality Checks"],
-  ["/reviews", "Approvals"],
-  ["/retrieval", "Search Playground"],
-  ["/lineage", "Evidence Trail"],
-  ["/consumers", "Connected Apps"],
-  ["/chat", "AI Chat"],
-];
+  { to: "/overview", label: "Overview", Icon: LayoutGrid },
+  { to: "/products", label: "Knowledge Products", Icon: Archive },
+  { to: "/sources", label: "Documents & Sources", Icon: Files },
+  { to: "/concepts", label: "Concepts & Rules", Icon: Network },
+  { to: "/explorer", label: "Explore Knowledge", Icon: Search },
+  { to: "/health", label: "Quality Checks", Icon: ShieldCheck },
+  { to: "/reviews", label: "Approvals", Icon: CircleCheck },
+  { to: "/retrieval", label: "Search Playground", Icon: ScanSearch },
+  { to: "/lineage", label: "Evidence Trail", Icon: GitBranch },
+  { to: "/consumers", label: "Connected Apps", Icon: Cable },
+  { to: "/chat", label: "AI Chat", Icon: MessageSquare },
+] as const;
 export function Shell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false),
     [identity, setIdentity] = useState(
@@ -79,8 +66,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <X />
         </button>
         <nav aria-label="Main navigation">
-          {destinations.map(([url, label], i) => {
-            const Icon = navIcons[i];
+          {destinations.map(({ to: url, label, Icon }) => {
             return (
               <NavLink
                 key={url}
@@ -121,7 +107,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <span>
               {path.startsWith("/products/")
                 ? "Knowledge product"
-                : destinations.find(([url]) => url === path)?.[1] ||
+                : destinations.find((item) => item.to === path)?.label ||
                   "Operations"}
             </span>
           </div>

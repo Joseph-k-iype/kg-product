@@ -17,7 +17,7 @@ import {
   LoaderCircle,
   X,
 } from "lucide-react";
-import { refresh } from "../api/client";
+import { refresh } from "@/api/client";
 const labels: Record<string, string> = {
   not_checked: "Needs checks",
   insufficient_data: "Needs input",

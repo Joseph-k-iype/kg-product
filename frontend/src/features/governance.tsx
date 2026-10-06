@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ShieldCheck, Play, Send, Check, Clock } from "lucide-react";
-import { api, useData } from "../api/client";
-import type { Evaluation, Review, Release, Metric } from "../api/types";
+import { api, useData } from "@/api/client";
+import type { Evaluation, Review, Release, Metric } from "@/api/types";
 import {
   Block,
   Field,
@@ -14,8 +14,8 @@ import {
   useNotice,
   date,
   NextLink,
-} from "../components/shared";
-import { scoped, useProduct } from "./product";
+} from "@/components/shared";
+import { useScopedPath, useProduct } from "@/features/product/context";
 function QualityRows({
   metrics,
   previous,
@@ -55,7 +55,7 @@ function QualityRows({
 }
 export function HealthPage() {
   const { product, readonly } = useProduct();
-  const path = scoped("evaluations");
+  const path = useScopedPath("evaluations");
   const { data, error, loading } = useData<Evaluation[]>(path);
   const { busy, run } = useNotice();
   const latest = data?.[0];
@@ -194,10 +194,7 @@ export function ReviewsPage() {
   const { product, readonly } = useProduct();
   const path = "/reviews?product_id=" + product.id;
   const { data, error, loading } = useData<Review[]>(path);
-  const { data: checks } = useData<Evaluation[]>(scoped("evaluations"));
-  const { data: releases } = useData<Release[]>(
-    "/products/" + product.id + "/releases",
-  );
+  const { data: checks } = useData<Evaluation[]>(useScopedPath("evaluations"));
   const [summary, setSummary] = useState(""),
     [selected, setSelected] = useState<Review | null>(null),
     [reason, setReason] = useState("");

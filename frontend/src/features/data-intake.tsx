@@ -1,7 +1,7 @@
 import type { Dispatch, SetStateAction } from "react";
 import { FileText, Table2, Network, Upload, X } from "lucide-react";
-import { api } from "../api/client";
-import { Field, ErrorState } from "../components/shared";
+import { api } from "@/api/client";
+import { Field, ErrorState } from "@/components/shared";
 
 export interface ImportPreview {
   kind: string;

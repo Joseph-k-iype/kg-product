@@ -24,6 +24,7 @@ test("the dashboard retains its artwork and workflows when WebGL is unavailable"
   await page.addInitScript(() => {
     const original = HTMLCanvasElement.prototype.getContext;
     HTMLCanvasElement.prototype.getContext = function (
+      this: HTMLCanvasElement,
       type: string,
       ...args: unknown[]
     ) {

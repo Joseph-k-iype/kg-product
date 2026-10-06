@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Network, ArrowRight, Flag } from "lucide-react";
-import { api, useData } from "../api/client";
-import type { Entity, Neighborhood, Lineage, LineageNode } from "../api/types";
+import { api, useData } from "@/api/client";
+import type { Entity, Neighborhood, Lineage, LineageNode } from "@/api/types";
 import {
   Block,
   Field,
@@ -12,8 +12,8 @@ import {
   Drawer,
   EvidenceLink,
   useNotice,
-} from "../components/shared";
-import { scoped, useProduct } from "./product";
+} from "@/components/shared";
+import { useScopedPath, useProduct } from "@/features/product/context";
 export function ExplorerPage() {
   const { product } = useProduct();
   const [query, setQuery] = useState(""),
@@ -21,7 +21,7 @@ export function ExplorerPage() {
     [selected, setSelected] = useState<Entity | null>(null),
     [reason, setReason] = useState(""),
     [mode, setMode] = useState("list");
-  const path = scoped(
+  const path = useScopedPath(
     "entities?q=" +
       encodeURIComponent(query) +
       "&entity_type=" +
@@ -31,14 +31,14 @@ export function ExplorerPage() {
     items: Entity[];
     build: { instance_count: number; relationship_count: number };
   }>(path);
-  const neighborPath = scoped(
+  const neighborPath = useScopedPath(
     "entities/" + encodeURIComponent(selected?.id || "") + "/neighbors",
   );
   const { data: neighbors } = useData<Neighborhood>(
     selected ? neighborPath : null,
   );
   const { busy, run } = useNotice();
-  const flagPath = scoped(
+  const flagPath = useScopedPath(
     "entities/" + encodeURIComponent(selected?.id || "") + "/flags",
   );
   return (
@@ -247,8 +247,8 @@ export function ExplorerPage() {
   );
 }
 export function LineagePage() {
-  const { product, revision } = useProduct();
-  const path = scoped("lineage");
+  const { revision } = useProduct();
+  const path = useScopedPath("lineage");
   const { data, error, loading } = useData<Lineage>(path);
   const [view, setView] = useState("trail"),
     [selected, setSelected] = useState<LineageNode | null>(null);

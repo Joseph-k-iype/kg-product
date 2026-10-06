@@ -7,9 +7,9 @@ import {
   Plus,
   CheckCircle2,
 } from "lucide-react";
-import { useData } from "../api/client";
-import type { OverviewData, Product } from "../api/types";
-import { KnowledgeSignal } from "../components/KnowledgeSignal";
+import { useData } from "@/api/client";
+import type { OverviewData, Product } from "@/api/types";
+import { KnowledgeSignal } from "@/components/KnowledgeSignal";
 import {
   Block,
   PageTitle,
@@ -19,7 +19,7 @@ import {
   Empty,
   date,
   NextLink,
-} from "../components/shared";
+} from "@/components/shared";
 export function ProductRows({ products }: { products: Product[] }) {
   return (
     <div className="table-wrap">

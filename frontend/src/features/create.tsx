@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Check, Plug } from "lucide-react";
-import { api } from "../api/client";
-import type { Product, Source } from "../api/types";
-import { useData } from "../api/client";
+import { api } from "@/api/client";
+import type { Product, Source } from "@/api/types";
+import { useData } from "@/api/client";
 import {
   PageTitle,
   Block,
@@ -11,7 +11,7 @@ import {
   useNotice,
   Status,
   ErrorState,
-} from "../components/shared";
+} from "@/components/shared";
 import { DataFiles, SourceFields, initialSource } from "./data-intake";
 import type { ImportFile } from "./data-intake";
 const steps = [
@@ -20,7 +20,7 @@ const steps = [
   ["Concepts", "Choose a simple starting point"],
   ["Readiness", "Understand checks and search settings"],
   ["Summary", "Review and create a draft"],
-];
+] as const;
 export function CreateProduct() {
   const [step, setStep] = useState(0),
     [name, setName] = useState(""),
@@ -139,8 +139,8 @@ export function CreateProduct() {
             <div className="wizard-step-caption">
               Step {step + 1} of {steps.length} · Setup progress
             </div>
-            <h2>{steps[step][0]}</h2>
-            <p>{steps[step][1]}</p>
+            <h2>{(steps[step] ?? steps[0])[0]}</h2>
+            <p>{(steps[step] ?? steps[0])[1]}</p>
             {step === 0 && (
               <div className="form-grid">
                 <Field label="Product name">

@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 PY := backend/.venv/bin/python
 PLAN_WORKSPACE := .superpowers/sdd/2026-10-06-knowledge-product-manager
-.PHONY: install services up migrate model seed dev api worker test test-fast test-integration test-e2e build reset docs docs-check
+.PHONY: install services up migrate model seed dev api worker test test-fast test-integration test-e2e check-ui build reset docs docs-check
 install:
 	uv sync --project backend --python 3.12 --extra test --extra embeddings
 	npm ci --prefix frontend
@@ -28,6 +28,8 @@ test:
 test-fast:
 	cd backend && .venv/bin/python -m pytest -q -m 'not model'
 test-integration: test
+check-ui:
+	npm run check --prefix frontend
 test-e2e:
 	cd frontend && npx playwright install chromium && npx playwright test
 build:

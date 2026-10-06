@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Search, Plus, Link2, ArrowRight } from "lucide-react";
-import { api, useData } from "../api/client";
-import type { Retrieval, Hit, Release, Consumer } from "../api/types";
+import { api, useData } from "@/api/client";
+import type { Retrieval, Release, Consumer } from "@/api/types";
 import {
   Block,
   Field,
@@ -12,8 +12,8 @@ import {
   ErrorState,
   Loading,
   Drawer,
-} from "../components/shared";
-import { useProduct } from "./product";
+} from "@/components/shared";
+import { useProduct } from "@/features/product/context";
 export function RetrievalPage() {
   const { product, revision, readonly } = useProduct();
   const { data: releases } = useData<Release[]>(

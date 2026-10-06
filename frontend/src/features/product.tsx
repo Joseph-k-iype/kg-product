@@ -1,15 +1,9 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  lazy,
-  Suspense,
-} from "react";
-import { Link, NavLink, useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState, lazy, Suspense } from "react";
+import { Link, NavLink, useParams } from "react-router-dom";
 import { Archive, FileText, Boxes, ShieldCheck, Send } from "lucide-react";
-import type { Product, Revision, OverviewData, Catalog } from "../api/types";
-import { api, useData } from "../api/client";
+import type { Product, OverviewData, Catalog } from "@/api/types";
+import { ProductContext, useProduct } from "@/features/product/context";
+import { api, useData } from "@/api/client";
 import {
   PageTitle,
   Status,
@@ -20,7 +14,7 @@ import {
   Field,
   Empty,
   useNotice,
-} from "../components/shared";
+} from "@/components/shared";
 import { DocumentsPage, ProcessingPage, SourcesPage } from "./documents";
 import { ConceptsPage } from "./concepts";
 import { ExplorerPage, LineagePage } from "./explore";
@@ -29,28 +23,6 @@ import { RetrievalPage, ConsumersPage } from "./consume";
 const ChatPage = lazy(() =>
   import("./chat").then((module) => ({ default: module.ChatPage })),
 );
-const ProductContext = createContext<{
-  product: Product;
-  revision: Revision;
-  readonly: boolean;
-} | null>(null);
-export function useProduct() {
-  const value = useContext(ProductContext);
-  if (!value) throw new Error("Select a knowledge product");
-  return value;
-}
-export function scoped(path: string) {
-  const { product, revision } = useProduct();
-  return (
-    "/products/" +
-    product.id +
-    "/" +
-    path +
-    (path.includes("?") ? "&" : "?") +
-    "revision_id=" +
-    revision.id
-  );
-}
 const tabs = [
   ["overview", "Overview"],
   ["sources", "Documents"],
@@ -91,6 +63,8 @@ export function Workspace({
     data.revisions.find((r) => r.id === selected) ||
     data.draft ||
     data.revisions[0];
+  if (!rev)
+    return <ErrorState message="This product has no available version" />;
   const readonly = rev.state === "published";
   const pages: Record<string, React.ReactNode> = {
     overview: <ProductOverview />,

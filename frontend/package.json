@@ -6,7 +6,15 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "tsc -b && vite build",
-    "test": "playwright test"
+    "test": "playwright test",
+    "typecheck": "tsc -b",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:e2e": "playwright test",
+    "format": "prettier --write src tooling *.ts *.json tests",
+    "format:check": "prettier --check src tooling *.ts *.json tests",
+    "check": "npm run format:check && npm run typecheck && npm run test:unit",
+    "preview": "vite preview --host 127.0.0.1 --port 4174"
   },
   "dependencies": {
     "@assistant-ui/react": "^0.15.25",
@@ -25,17 +33,25 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",
     "@playwright/test": "^1.52.0",
+    "@testing-library/dom": "10.4.2",
+    "@testing-library/react": "16.3.3",
+    "@types/node": "24.19.1",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@vitejs/plugin-react": "^4.5.0",
+    "jsdom": "26.1.0",
     "mermaid": "12.1.0",
     "prettier": "^3.9.9",
     "typescript": "~5.8.3",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vitest": "5.0.3"
   },
   "overrides": {
     "@vercel/routing-utils": {
       "path-to-regexp": "6.3.0"
     }
+  },
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0 || >=26.0.0"
   }
 }

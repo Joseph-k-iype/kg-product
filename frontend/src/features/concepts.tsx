@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Boxes, ShieldCheck, FileCode } from "lucide-react";
-import { api, ApiError, useData } from "../api/client";
-import type { Ontology, Concept, PropertyDefinition, Rule } from "../api/types";
+import { api, ApiError, useData } from "@/api/client";
+import type { Ontology, Concept, PropertyDefinition, Rule } from "@/api/types";
 import {
   Block,
   Field,
@@ -11,8 +11,8 @@ import {
   Loading,
   useNotice,
   NextLink,
-} from "../components/shared";
-import { scoped, useProduct } from "./product";
+} from "@/components/shared";
+import { useScopedPath, useProduct } from "@/features/product/context";
 function key(iri: string) {
   return (
     iri
@@ -40,7 +40,7 @@ function defaultMapping(d: Ontology) {
 }
 export function ConceptsPage() {
   const { product, readonly } = useProduct();
-  const path = scoped("ontology");
+  const path = useScopedPath("ontology");
   const { data, error, loading } = useData<Ontology>(path);
   const { busy, run } = useNotice();
   const [view, setView] = useState("classes"),
@@ -261,12 +261,14 @@ export function ConceptsPage() {
         </Block>
       )}
       <nav className="tabs" aria-label="Concept views">
-        {[
-          ["classes", "Concepts"],
-          ["attributes", "Attributes"],
-          ["relationships", "Relationships"],
-          ["rules", "Business Rules"],
-        ].map(([id, title]) => (
+        {(
+          [
+            ["classes", "Concepts"],
+            ["attributes", "Attributes"],
+            ["relationships", "Relationships"],
+            ["rules", "Business Rules"],
+          ] as const
+        ).map(([id, title]) => (
           <button
             key={id}
             className={view === id ? "active" : ""}

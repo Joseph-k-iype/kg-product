@@ -25,10 +25,10 @@ import {
   BookOpen,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { api, useData } from "../api/client";
-import type { Release } from "../api/types";
-import { Block, Loading, ErrorState, Status } from "../components/shared";
-import { useProduct } from "./product";
+import { api, useData } from "@/api/client";
+import type { Release } from "@/api/types";
+import { Block, Loading, ErrorState, Status } from "@/components/shared";
+import { useProduct } from "@/features/product/context";
 
 interface Source {
   citation: string;

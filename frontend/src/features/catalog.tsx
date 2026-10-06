@@ -1,7 +1,7 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { Plus, Archive, ArrowRight } from "lucide-react";
-import { useData } from "../api/client";
-import type { Catalog, OverviewData } from "../api/types";
+import { useData } from "@/api/client";
+import type { Catalog, OverviewData } from "@/api/types";
 import {
   Block,
   PageTitle,
@@ -10,7 +10,7 @@ import {
   Empty,
   ErrorState,
   Loading,
-} from "../components/shared";
+} from "@/components/shared";
 import { ProductRows } from "./overview";
 export function CatalogPage() {
   const [params, setParams] = useSearchParams();

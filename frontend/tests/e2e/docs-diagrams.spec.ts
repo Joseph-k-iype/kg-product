@@ -25,8 +25,8 @@ for (const { file, index, source } of diagrams) {
     const result = await page.evaluate(
       async ({ source, id }) => {
         // Vite serves the installed browser bundle; no CDN/provider network is used.
-        // @ts-expect-error Browser-only module URL is served by the dev server.
         const { default: mermaid } =
+          // @ts-expect-error Browser-only module URL is served by the dev server.
           await import("/node_modules/mermaid/dist/mermaid.esm.min.mjs");
         mermaid.initialize({
           startOnLoad: false,

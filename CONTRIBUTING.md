@@ -4,7 +4,7 @@ Start with the [README](README.md), [architecture](docs/architecture.md), and [d
 
 ## Development setup
 
-Use Python 3.12 through uv, Node 22.12+ (Node 24 recommended), npm, Docker Compose v2, and make. Install dependencies with `make install`; start storage, migrate, download the pinned model, and seed as described in README. Run API/worker/frontend in separate terminals or choose the container API/worker path.
+Use Python 3.12 through uv, Node 22.x at 22.12+, 24.x, or 26+ (Node 24 recommended), npm, Docker Compose v2, and make. Install dependencies with `make install`; start storage, migrate, download the pinned model, and seed as described in README. Run API/worker/frontend in separate terminals or choose the container API/worker path.
 
 Create a feature branch for changes. The repository supplies dependency locks but no hosted CI workflow yet; run required checks locally. Do not add local `.env`, databases, object exports, backups, node_modules, model caches, or generated build/test output to commits. Use synthetic fixtures for reproducible examples.
 
@@ -28,13 +28,14 @@ For database changes, add an Alembic migration and verify a fresh install plus u
 | Change | Appropriate checks |
 |---|---|
 | Business service/schema/adapter | Relevant backend regression tests; full `make test` when cross-feature behavior changes. |
-| UI workflow/state/accessibility | Relevant Playwright tests against a running local stack; `make build`; full browser suite when shared navigation/context changes. |
+| UI workflow/state/accessibility | `make check-ui`, relevant Playwright tests against a running local stack; `make build`; full browser suite when shared navigation/context changes. |
 | Agent/gateway integration | Scoped retrieval and metadata tests, tool restrictions, stream ownership/cancellation, sanitized errors, and explicit real-provider acceptance if needed. |
 | Routes/ORM models/docs | `make docs`, `make docs-check`, link and example review. |
 | Migration | Fresh chain and upgraded database verification against local test infrastructure. |
 
 ```sh
 make test
+make check-ui
 make test-e2e
 make build
 make docs-check
@@ -42,7 +43,7 @@ make docs-check
 
 `make test` initializes `knowledge_test`; fixtures configure isolated relational metadata. Real adapter/model tests need local storage and the downloaded model. `make test-fast` excludes the actual-model-marked journey but still needs services. Browser tests use the demo workspace and leave inspectable synthetic products.
 
-Focused Python lint can be run with `backend/.venv/bin/ruff check <changed paths>`. Existing legacy modules do not all pass an expanded whole-repository rule set; distinguish a focused passing check from a global lint claim. Frontend verification uses TypeScript/Vite and Playwright; no separate frontend lint script is configured.
+Focused Python lint can be run with `backend/.venv/bin/ruff check <changed paths>`. Existing legacy modules do not all pass an expanded whole-repository rule set; distinguish a focused passing check from a global lint claim. Frontend verification uses Prettier, strict TypeScript, Vitest/React Testing Library, Vite, and Playwright. No separate ESLint script is configured. See the [frontend strategy](docs/frontend-strategy.md) for module ownership and the data-handling contract. Use `npm run test:unit:watch --prefix frontend` for fast iteration and `npm run preview --prefix frontend` to inspect the production build. Keep browser and tooling type checks separate; share runtime aliases through `frontend/tooling/paths.ts`.
 
 Do not use provider stubs as evidence of real agent compatibility. Real provider tests are optional, require an explicitly supplied server credential, can incur usage, and should use synthetic evidence. The committed tests do not need a provider key. Record exact executed results and limitations in `docs/verification.md` when adding a substantial feature.
 

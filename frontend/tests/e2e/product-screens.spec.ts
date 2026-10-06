@@ -53,12 +53,10 @@ test("published product screens retain context, load real data, and are accessib
       page.getByText("Loading your workspace…", { exact: true }),
     ).toHaveCount(0);
     await expect(
-      page
-        .getByRole("alert")
-        .filter({
-          hasText:
-            /Internal server error|Unable to complete|Service unavailable/i,
-        }),
+      page.getByRole("alert").filter({
+        hasText:
+          /Internal server error|Unable to complete|Service unavailable/i,
+      }),
     ).toHaveCount(0);
     const accessibility = await new AxeBuilder({ page }).analyze();
     expect(accessibility.violations, label).toEqual([]);

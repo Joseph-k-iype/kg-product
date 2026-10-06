@@ -28,6 +28,7 @@ This is a local, single-workspace MVP. Identities are synthetic; production auth
 | Guide | Read it for |
 |---|---|
 | [Documentation index](docs/README.md) | All guides and generated references. |
+| [Frontend strategy](docs/frontend-strategy.md) | React/Vite/TypeScript boundaries, data handling, and quality gates. |
 | [Architecture](docs/architecture.md) | Components, storage responsibilities, request flows, consistency, and extension seams. |
 | [Data model](docs/data-model.md) | Domain entities, relationships, lifecycle, release manifests, and migrations. |
 | [API guide](docs/api.md) | Contracts, curl examples, errors, revision scope, streaming chat, and private gateway behavior. |
@@ -41,7 +42,7 @@ This is a local, single-workspace MVP. Identities are synthetic; production auth
 
 ## Run locally
 
-Use **Python 3.12**, **uv**, **Docker with Compose v2**, and **Node.js 22.12+** (Node 24 recommended) with npm. Node 20 is not sufficient for all current Blume dependencies. `make` is used for convenience commands. First-time installation and the embedding-model download require network access.
+Use **Python 3.12**, **uv**, **Docker with Compose v2**, and **Node.js 22.12+ on the 22.x line, 24.x, or 26+** (Node 24 recommended) with npm. Node 20 is not sufficient for all current Blume dependencies. `make` is used for convenience commands. First-time installation and the embedding-model download require network access.
 
 From the repository root:
 
@@ -128,6 +129,7 @@ The container loads the root `.env` through Compose, with internal storage URLs 
 ```sh
 make test         # all backend tests; real services and local embedding model required
 make test-fast    # skips tests marked model; still requires storage services
+make check-ui     # formatting, strict TypeScript, and frontend unit tests
 make test-e2e     # running API/worker/frontend; installs Chromium if needed
 make build        # TypeScript check and Vite production output
 make docs         # regenerate public API and ORM reference files
@@ -149,6 +151,10 @@ backend/
   alembic/versions/         Migrations 001–010
   tests/                    Unit and integration coverage
 frontend/
+  src/app/                 Routes and application providers
+  src/api/                 JSON transport, response types, and scoped reads
+  src/test/                Frontend transport and hook regressions
+  tooling/                 Shared build/test aliases
   src/components/          Shared shell, business controls, shader decoration
   src/features/            Product workflows and AI chat
   tests/e2e/               Browser and accessibility workflows

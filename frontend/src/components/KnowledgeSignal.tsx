@@ -117,7 +117,7 @@ export function KnowledgeSignal() {
       last = 0,
       visible = true,
       lost = false;
-    let point = [0.5, 0.5];
+    let point: [number, number] = [0.5, 0.5];
     const canAnimate = () =>
       !paused && !media.matches && visible && !document.hidden && !lost;
     function draw() {
@@ -182,6 +182,7 @@ export function KnowledgeSignal() {
     const resize = new ResizeObserver(() => draw());
     resize.observe(container);
     const intersection = new IntersectionObserver(([entry]) => {
+      if (!entry) return;
       visible = entry.isIntersecting;
       sync();
     });

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { FileText, FileUp, Plus, RefreshCw, ArrowRight } from "lucide-react";
-import { api, useData } from "../api/client";
-import type { DocumentRecord, Source, Catalog, Job } from "../api/types";
+import { FileText, FileUp, Plus, RefreshCw } from "lucide-react";
+import { api, useData } from "@/api/client";
+import type { DocumentRecord, Source, Catalog, Job } from "@/api/types";
 import {
   Block,
   Field,
@@ -14,8 +14,8 @@ import {
   useNotice,
   PageTitle,
   date,
-} from "../components/shared";
-import { scoped, useProduct } from "./product";
+} from "@/components/shared";
+import { useScopedPath, useProduct } from "@/features/product/context";
 import { SourceFields, initialSource } from "./data-intake";
 const stages = [
   ["uploaded", "Uploaded"],
@@ -59,8 +59,8 @@ function Stages({ doc }: { doc: DocumentRecord }) {
   );
 }
 export function DocumentsPage() {
-  const { product, readonly } = useProduct();
-  const path = scoped("documents");
+  const { readonly } = useProduct();
+  const path = useScopedPath("documents");
   const { data, error, loading } = useData<DocumentRecord[]>(path, 3000);
   const [selected, setSelected] = useState<string | null>(null);
   const { busy, run } = useNotice();
@@ -338,8 +338,8 @@ export function DocumentDrawer({
   );
 }
 export function ProcessingPage() {
-  const { product, readonly } = useProduct();
-  const path = scoped("processing");
+  const { readonly } = useProduct();
+  const path = useScopedPath("processing");
   const { data, error, loading } = useData<{
     documents: DocumentRecord[];
     revision_jobs: Job[];
@@ -358,7 +358,7 @@ export function ProcessingPage() {
               disabled={busy}
               onClick={() =>
                 run("Knowledge preparation queued", () =>
-                  api(scopedOutside(product.id, path), "POST"),
+                  api(scopedOutside(path), "POST"),
                 )
               }
             >
@@ -512,7 +512,7 @@ export function ProcessingPage() {
     </>
   );
 }
-function scopedOutside(id: string, path: string) {
+function scopedOutside(path: string) {
   return path.replace("/processing?", "/processing/run?");
 }
 export function SourcesPage() {

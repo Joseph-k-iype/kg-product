@@ -11,6 +11,7 @@ Start with the [project README](../README.md) to run the application, or the [bu
 - [OpenAPI specification](api/openapi.json): exported OpenAPI 3.1 contract for the public endpoints.
 - [Generated endpoint inventory](api/endpoints.md): all 56 declared operations and parameter/body references.
 - [Adapter contracts](adapters.md): replacement seams and supported semantics.
+- [Frontend strategy](frontend-strategy.md): React/Vite/TypeScript boundaries, data handling, and quality gates.
 - [Chat design](chat-design.md): assistant-ui/Blume, Claude Agent SDK, and LiteLLM integration details.
 
 ## Setup and operation
