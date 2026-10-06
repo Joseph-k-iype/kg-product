@@ -74,7 +74,14 @@ def open_draft(session, product_id):
     latest = session.scalars(select(Revision).where(Revision.product_id == product.id).order_by(Revision.number.desc())).first()
     rev = Revision(product_id=product.id,number=latest.number+1,config=latest.config.copy(),ontology_id=latest.ontology_id,mapping_id=latest.mapping_id)
     session.add(rev); session.flush()
-    # Later feature owns the document snapshot copy on new draft.
+    from app.features.documents.models import Document,Chunk
+    docs=session.scalars(select(Document).where(Document.revision_id==latest.id)).all()
+    for old in docs:
+        copy=Document(product_id=product.id,revision_id=rev.id,source_id=old.source_id,name=old.name,content_type=old.content_type,object_key=old.object_key,sha256=old.sha256,size=old.size,extracted_key=old.extracted_key,extracted_sha256=old.extracted_sha256,extracted_text=old.extracted_text,state=old.state,processing_version=old.processing_version,uploaded_by=old.uploaded_by,uploaded_at=old.uploaded_at)
+        session.add(copy);session.flush()
+        for chunk in session.scalars(select(Chunk).where(Chunk.document_id==old.id)):
+            session.add(Chunk(product_id=product.id,revision_id=rev.id,document_id=copy.id,ordinal=chunk.ordinal,start=chunk.start,end=chunk.end,text=chunk.text,processing_version=chunk.processing_version,embedding=chunk.embedding,model_name=chunk.model_name,model_revision=chunk.model_revision,model_dimension=chunk.model_dimension))
+    session.flush()
     session.add(Activity(product_id=product.id,revision_id=rev.id,action='New draft opened'))
     return detail(session,product)
 

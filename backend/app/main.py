@@ -39,3 +39,12 @@ app.include_router(retrieval_router)
 
 from app.features.graph.routes import router as graph_router
 app.include_router(graph_router)
+
+from app.features.evaluations.routes import router as evaluations_router
+app.include_router(evaluations_router)
+
+from app.features.reviews.routes import router as reviews_router
+app.include_router(reviews_router)
+
+from app.features.releases.routes import router as releases_router
+app.include_router(releases_router)
